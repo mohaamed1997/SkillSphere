@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '@core/services/auth.service';
 import { DashboardService } from '@core/services/data.service';
 import { AdminDashboardDto, ManagerDashboardDto, TeacherDashboardDto, SupervisorDashboardDto, ParentDashboardDto } from '@core/models';
+import { TranslatePipe } from '@core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   template: `
     <!-- Admin / SuperAdmin Dashboard -->
     <div *ngIf="auth.userRole === 'SchoolAdmin' || auth.userRole === 'PlatformSuperAdmin'">
@@ -16,40 +17,40 @@ import { AdminDashboardDto, ManagerDashboardDto, TeacherDashboardDto, Supervisor
           <div class="card card-stats">
             <div class="card-header card-header-icon card-header-info">
               <div class="card-icon"><i class="material-icons">person</i></div>
-              <p class="card-category">Teachers</p>
+              <p class="card-category">{{ 'Teachers' | t }}</p>
               <h3 class="card-title">{{ adminData?.totalTeachers || 0 }}</h3>
             </div>
-            <div class="card-footer"><div class="stats"><i class="material-icons">school</i> Active staff members</div></div>
+            <div class="card-footer"><div class="stats"><i class="material-icons">school</i> {{ 'Active staff members' | t }}</div></div>
           </div>
         </div>
         <div class="col-md-3">
           <div class="card card-stats">
             <div class="card-header card-header-icon card-header-success">
               <div class="card-icon"><i class="material-icons">people</i></div>
-              <p class="card-category">Students</p>
+              <p class="card-category">{{ 'Students' | t }}</p>
               <h3 class="card-title">{{ adminData?.totalStudents || 0 }}</h3>
             </div>
-            <div class="card-footer"><div class="stats"><i class="material-icons">groups</i> Enrolled students</div></div>
+            <div class="card-footer"><div class="stats"><i class="material-icons">groups</i> {{ 'Enrolled students' | t }}</div></div>
           </div>
         </div>
         <div class="col-md-3">
           <div class="card card-stats">
             <div class="card-header card-header-icon card-header-warning">
               <div class="card-icon"><i class="material-icons">family_restroom</i></div>
-              <p class="card-category">Parents</p>
+              <p class="card-category">{{ 'Parents' | t }}</p>
               <h3 class="card-title">{{ adminData?.totalParents || 0 }}</h3>
             </div>
-            <div class="card-footer"><div class="stats"><i class="material-icons">verified_user</i> Registered parents</div></div>
+            <div class="card-footer"><div class="stats"><i class="material-icons">verified_user</i> {{ 'Registered parents' | t }}</div></div>
           </div>
         </div>
         <div class="col-md-3" *ngIf="(adminData?.openEscalations || 0) > 0">
           <div class="card card-stats">
             <div class="card-header card-header-icon card-header-danger">
               <div class="card-icon"><i class="material-icons">warning</i></div>
-              <p class="card-category">Open Escalations</p>
+              <p class="card-category">{{ 'Open Escalations' | t }}</p>
               <h3 class="card-title">{{ adminData?.openEscalations }}</h3>
             </div>
-            <div class="card-footer"><div class="stats"><i class="material-icons">priority_high</i> Requires attention</div></div>
+            <div class="card-footer"><div class="stats"><i class="material-icons">priority_high</i> {{ 'Requires attention' | t }}</div></div>
           </div>
         </div>
       </div>
@@ -58,20 +59,20 @@ import { AdminDashboardDto, ManagerDashboardDto, TeacherDashboardDto, Supervisor
           <div class="card card-stats">
             <div class="card-header card-header-icon card-header-rose">
               <div class="card-icon"><i class="material-icons">report_problem</i></div>
-              <p class="card-category">Unresolved Reports</p>
+              <p class="card-category">{{ 'Unresolved Reports' | t }}</p>
               <h3 class="card-title">{{ adminData?.unresolvedInternalReports }}</h3>
             </div>
-            <div class="card-footer"><div class="stats"><i class="material-icons">pending_actions</i> Awaiting resolution</div></div>
+            <div class="card-footer"><div class="stats"><i class="material-icons">pending_actions</i> {{ 'Awaiting resolution' | t }}</div></div>
           </div>
         </div>
         <div class="col-md-3">
           <div class="card card-stats">
             <div class="card-header card-header-icon card-header-info">
               <div class="card-icon"><i class="material-icons">notifications_active</i></div>
-              <p class="card-category">Notifications</p>
+              <p class="card-category">{{ 'Notifications' | t }}</p>
               <h3 class="card-title">{{ adminData?.notificationStatus?.delivered || 0 }}</h3>
             </div>
-            <div class="card-footer"><div class="stats"><i class="material-icons">check_circle</i> Delivered</div></div>
+            <div class="card-footer"><div class="stats"><i class="material-icons">check_circle</i> {{ 'Delivered' | t }}</div></div>
           </div>
         </div>
       </div>
@@ -84,40 +85,40 @@ import { AdminDashboardDto, ManagerDashboardDto, TeacherDashboardDto, Supervisor
           <div class="card card-stats">
             <div class="card-header card-header-icon" [ngClass]="(managerData?.missingAttendance || 0) > 0 ? 'card-header-danger' : 'card-header-success'">
               <div class="card-icon"><i class="material-icons">fact_check</i></div>
-              <p class="card-category">Missing Attendance</p>
+              <p class="card-category">{{ 'Missing Attendance' | t }}</p>
               <h3 class="card-title">{{ managerData?.missingAttendance || 0 }}</h3>
             </div>
-            <div class="card-footer"><div class="stats"><i class="material-icons">today</i> Today's records</div></div>
+            <div class="card-footer"><div class="stats"><i class="material-icons">today</i> {{ "Today's records" | t }}</div></div>
           </div>
         </div>
         <div class="col-md-3">
           <div class="card card-stats">
             <div class="card-header card-header-icon" [ngClass]="(managerData?.missingWeeklyReports || 0) > 0 ? 'card-header-warning' : 'card-header-success'">
               <div class="card-icon"><i class="material-icons">summarize</i></div>
-              <p class="card-category">Missing Reports</p>
+              <p class="card-category">{{ 'Missing Reports' | t }}</p>
               <h3 class="card-title">{{ managerData?.missingWeeklyReports || 0 }}</h3>
             </div>
-            <div class="card-footer"><div class="stats"><i class="material-icons">pending</i> Weekly reports due</div></div>
+            <div class="card-footer"><div class="stats"><i class="material-icons">pending</i> {{ 'Weekly reports due' | t }}</div></div>
           </div>
         </div>
         <div class="col-md-3">
           <div class="card card-stats">
             <div class="card-header card-header-icon card-header-info">
               <div class="card-icon"><i class="material-icons">schedule</i></div>
-              <p class="card-category">Timetable Conflicts</p>
+              <p class="card-category">{{ 'Timetable Conflicts' | t }}</p>
               <h3 class="card-title">{{ managerData?.timetableConflicts || 0 }}</h3>
             </div>
-            <div class="card-footer"><div class="stats"><i class="material-icons">event_busy</i> Scheduling issues</div></div>
+            <div class="card-footer"><div class="stats"><i class="material-icons">event_busy</i> {{ 'Scheduling issues' | t }}</div></div>
           </div>
         </div>
         <div class="col-md-3">
           <div class="card card-stats">
             <div class="card-header card-header-icon" [ngClass]="(managerData?.studentRiskQueue || 0) > 0 ? 'card-header-danger' : 'card-header-success'">
               <div class="card-icon"><i class="material-icons">health_and_safety</i></div>
-              <p class="card-category">Students at Risk</p>
+              <p class="card-category">{{ 'Students at Risk' | t }}</p>
               <h3 class="card-title">{{ managerData?.studentRiskQueue || 0 }}</h3>
             </div>
-            <div class="card-footer"><div class="stats"><i class="material-icons">monitor_heart</i> Requires follow-up</div></div>
+            <div class="card-footer"><div class="stats"><i class="material-icons">monitor_heart</i> {{ 'Requires follow-up' | t }}</div></div>
           </div>
         </div>
       </div>
@@ -130,40 +131,40 @@ import { AdminDashboardDto, ManagerDashboardDto, TeacherDashboardDto, Supervisor
           <div class="card card-stats">
             <div class="card-header card-header-icon card-header-info">
               <div class="card-icon"><i class="material-icons">event</i></div>
-              <p class="card-category">Today's Sessions</p>
+              <p class="card-category">{{ "Today's Sessions" | t }}</p>
               <h3 class="card-title">{{ teacherData?.todaySessions?.length || 0 }}</h3>
             </div>
-            <div class="card-footer"><div class="stats"><i class="material-icons">schedule</i> Scheduled today</div></div>
+            <div class="card-footer"><div class="stats"><i class="material-icons">schedule</i> {{ 'Scheduled today' | t }}</div></div>
           </div>
         </div>
         <div class="col-md-3">
           <div class="card card-stats">
             <div class="card-header card-header-icon" [ngClass]="(teacherData?.attendanceTasksDue || 0) > 0 ? 'card-header-danger' : 'card-header-success'">
               <div class="card-icon"><i class="material-icons">checklist</i></div>
-              <p class="card-category">Attendance Due</p>
+              <p class="card-category">{{ 'Attendance Due' | t }}</p>
               <h3 class="card-title">{{ teacherData?.attendanceTasksDue || 0 }}</h3>
             </div>
-            <div class="card-footer"><div class="stats"><i class="material-icons">pending_actions</i> Awaiting submission</div></div>
+            <div class="card-footer"><div class="stats"><i class="material-icons">pending_actions</i> {{ 'Awaiting submission' | t }}</div></div>
           </div>
         </div>
         <div class="col-md-3">
           <div class="card card-stats">
             <div class="card-header card-header-icon card-header-warning">
               <div class="card-icon"><i class="material-icons">description</i></div>
-              <p class="card-category">Reports Due</p>
+              <p class="card-category">{{ 'Reports Due' | t }}</p>
               <h3 class="card-title">{{ teacherData?.weeklyReportTasksDue || 0 }}</h3>
             </div>
-            <div class="card-footer"><div class="stats"><i class="material-icons">edit_note</i> Weekly reports pending</div></div>
+            <div class="card-footer"><div class="stats"><i class="material-icons">edit_note</i> {{ 'Weekly reports pending' | t }}</div></div>
           </div>
         </div>
         <div class="col-md-3">
           <div class="card card-stats">
             <div class="card-header card-header-icon card-header-success">
               <div class="card-icon"><i class="material-icons">people</i></div>
-              <p class="card-category">My Students</p>
+              <p class="card-category">{{ 'My Students' | t }}</p>
               <h3 class="card-title">{{ teacherData?.totalAssignedStudents || 0 }}</h3>
             </div>
-            <div class="card-footer"><div class="stats"><i class="material-icons">school</i> Assigned students</div></div>
+            <div class="card-footer"><div class="stats"><i class="material-icons">school</i> {{ 'Assigned students' | t }}</div></div>
           </div>
         </div>
       </div>
@@ -173,20 +174,20 @@ import { AdminDashboardDto, ManagerDashboardDto, TeacherDashboardDto, Supervisor
         <div class="col-md-12">
           <div class="card">
             <div class="card-header card-header-primary">
-              <h4 class="card-title">Today's Schedule</h4>
-              <p class="card-category">Your sessions for today</p>
+              <h4 class="card-title">{{ "Today's Schedule" | t }}</h4>
+              <p class="card-category">{{ 'Your sessions for today' | t }}</p>
             </div>
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table">
-                  <thead><tr><th>Time</th><th>Subject</th><th>Class</th><th>Room</th><th>Attendance</th></tr></thead>
+                  <thead><tr><th>{{ 'Time' | t }}</th><th>{{ 'Subject' | t }}</th><th>{{ 'Class' | t }}</th><th>{{ 'Room' | t }}</th><th>{{ 'Attendance' | t }}</th></tr></thead>
                   <tbody>
                     <tr *ngFor="let s of teacherData!.todaySessions">
                       <td>{{ s.startTime }} - {{ s.endTime }}</td>
                       <td>{{ s.subjectName }}</td>
                       <td>{{ s.gradeName }} {{ s.groupName }}</td>
                       <td>{{ s.roomName || '-' }}</td>
-                      <td><span [class]="s.attendanceSubmitted ? 'badge badge-success' : 'badge badge-warning'">{{ s.attendanceSubmitted ? 'Done' : 'Pending' }}</span></td>
+                      <td><span [class]="s.attendanceSubmitted ? 'badge badge-success' : 'badge badge-warning'">{{ (s.attendanceSubmitted ? 'Done' : 'Pending') | t }}</span></td>
                     </tr>
                   </tbody>
                 </table>
@@ -204,30 +205,30 @@ import { AdminDashboardDto, ManagerDashboardDto, TeacherDashboardDto, Supervisor
           <div class="card card-stats">
             <div class="card-header card-header-icon" [ngClass]="(supervisorData?.internalReportsInbox || 0) > 0 ? 'card-header-danger' : 'card-header-success'">
               <div class="card-icon"><i class="material-icons">inbox</i></div>
-              <p class="card-category">Reports Inbox</p>
+              <p class="card-category">{{ 'Reports Inbox' | t }}</p>
               <h3 class="card-title">{{ supervisorData?.internalReportsInbox || 0 }}</h3>
             </div>
-            <div class="card-footer"><div class="stats"><i class="material-icons">mail</i> Pending review</div></div>
+            <div class="card-footer"><div class="stats"><i class="material-icons">mail</i> {{ 'Pending review' | t }}</div></div>
           </div>
         </div>
         <div class="col-md-4">
           <div class="card card-stats">
             <div class="card-header card-header-icon card-header-warning">
               <div class="card-icon"><i class="material-icons">gpp_maybe</i></div>
-              <p class="card-category">Compliance Alerts</p>
+              <p class="card-category">{{ 'Compliance Alerts' | t }}</p>
               <h3 class="card-title">{{ supervisorData?.complianceAlerts || 0 }}</h3>
             </div>
-            <div class="card-footer"><div class="stats"><i class="material-icons">policy</i> Policy alerts</div></div>
+            <div class="card-footer"><div class="stats"><i class="material-icons">policy</i> {{ 'Policy alerts' | t }}</div></div>
           </div>
         </div>
         <div class="col-md-4">
           <div class="card card-stats">
             <div class="card-header card-header-icon card-header-info">
               <div class="card-icon"><i class="material-icons">trending_up</i></div>
-              <p class="card-category">Trending Students</p>
+              <p class="card-category">{{ 'Trending Students' | t }}</p>
               <h3 class="card-title">{{ supervisorData?.trendingStudents?.length || 0 }}</h3>
             </div>
-            <div class="card-footer"><div class="stats"><i class="material-icons">analytics</i> Multiple reports</div></div>
+            <div class="card-footer"><div class="stats"><i class="material-icons">analytics</i> {{ 'Multiple reports' | t }}</div></div>
           </div>
         </div>
       </div>
@@ -237,13 +238,13 @@ import { AdminDashboardDto, ManagerDashboardDto, TeacherDashboardDto, Supervisor
         <div class="col-md-12">
           <div class="card">
             <div class="card-header card-header-warning">
-              <h4 class="card-title">Trending Students</h4>
-              <p class="card-category">Students with multiple reports</p>
+              <h4 class="card-title">{{ 'Trending Students' | t }}</h4>
+              <p class="card-category">{{ 'Students with multiple reports' | t }}</p>
             </div>
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table">
-                  <thead><tr><th>Student</th><th>Report Count</th><th>Latest Category</th></tr></thead>
+                  <thead><tr><th>{{ 'Student' | t }}</th><th>{{ 'Report Count' | t }}</th><th>{{ 'Latest Category' | t }}</th></tr></thead>
                   <tbody>
                     <tr *ngFor="let s of supervisorData!.trendingStudents">
                       <td>{{ s.studentName }}</td>
@@ -272,11 +273,11 @@ import { AdminDashboardDto, ManagerDashboardDto, TeacherDashboardDto, Supervisor
               <div class="child-stats-row">
                 <div class="child-stat">
                   <span class="stat-value">{{ child.totalWeeklyReports }}</span>
-                  <span class="stat-label">Reports</span>
+                  <span class="stat-label">{{ 'Reports' | t }}</span>
                 </div>
                 <div class="child-stat">
                   <span class="stat-value">{{ child.averageGrade ? (child.averageGrade | number:'1.0-1') : 'N/A' }}</span>
-                  <span class="stat-label">Avg Score</span>
+                  <span class="stat-label">{{ 'Avg Score' | t }}</span>
                 </div>
               </div>
             </div>
@@ -291,11 +292,11 @@ import { AdminDashboardDto, ManagerDashboardDto, TeacherDashboardDto, Supervisor
         <div class="col-md-12">
           <div class="card">
             <div class="card-header card-header-primary">
-              <h4 class="card-title">Student Portal</h4>
-              <p class="card-category">Your learning hub</p>
+              <h4 class="card-title">{{ 'Student Portal' | t }}</h4>
+              <p class="card-category">{{ 'Your learning hub' | t }}</p>
             </div>
             <div class="card-body">
-              <p>Welcome to your student dashboard. Check your weekly reports and attendance from the navigation menu.</p>
+              <p>{{ 'Welcome to your student dashboard. Check your weekly reports and attendance from the navigation menu.' | t }}</p>
             </div>
           </div>
         </div>
@@ -305,7 +306,7 @@ import { AdminDashboardDto, ManagerDashboardDto, TeacherDashboardDto, Supervisor
     <!-- Loading -->
     <div *ngIf="loading" class="row">
       <div class="col-md-12">
-        <div class="card"><div class="card-body"><p class="text-muted">Loading dashboard data...</p></div></div>
+        <div class="card"><div class="card-body"><p class="text-muted">{{ 'Loading dashboard data...' | t }}</p></div></div>
       </div>
     </div>
   `,

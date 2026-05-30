@@ -229,3 +229,37 @@ $transition: all 0.3s cubic-bezier(0.685, 0.0473, 0.346, 1);
     display: none;
   }
 }
+
+
+/* ----- Language toggle button ----- */
+.btn-lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f5f5f5;
+  border: none;
+  cursor: pointer;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  color: #3c4858;
+  font-family: inherit;
+  transition: background 0.15s;
+  i { font-size: 18px; color: #999; }
+  &:hover { background: #ececec; }
+}
+
+/* ----- RTL adjustments ----- */
+:host-context([dir="rtl"]) {
+  .sidebar { left: auto; right: 0; box-shadow: -2px 0 20px rgba(0,0,0,0.06), -2px 0 6px rgba(0,0,0,0.04); }
+  .main-panel { margin-left: 0; margin-right: -width; }
+  .sidebar .logo .logo-subtitle { padding-left: 0; padding-right: 38px; }
+  .user-chip .user-role { padding-left: 0; padding-right: 4px; border-left: none; border-right: 1px solid #ddd; }
+}
+@media (max-width: 991px) {
+  :host-context([dir="rtl"]) {
+    .sidebar { transform: translateX(-width + 10px); &.sidebar-open { transform: translateX(0); } }
+    .main-panel { margin-right: 0; }
+  }
+}
+

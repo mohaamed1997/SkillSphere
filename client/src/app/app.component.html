@@ -5,118 +5,118 @@
     <div class="logo">
       <a class="logo-text">
         <i class="material-icons logo-icon">school</i>
-        <span>SkillSphere</span>
+        <span>{{ 'SkillSphere' | t }}</span>
       </a>
-      <small class="logo-subtitle">{{ auth.currentUser?.user?.schoolTenantId ? 'School Portal' : 'Platform Admin' }}</small>
+      <small class="logo-subtitle">{{ (auth.currentUser?.user?.schoolTenantId ? 'School Portal' : 'Platform Admin') | t }}</small>
     </div>
     <div class="sidebar-wrapper">
       <ul class="nav">
         <li routerLinkActive="active">
           <a routerLink="/dashboard">
             <i class="material-icons">dashboard</i>
-            <p>Dashboard</p>
+            <p>{{ 'Dashboard' | t }}</p>
           </a>
         </li>
         <li routerLinkActive="active" *ngIf="auth.userRole === 'PlatformSuperAdmin'">
           <a routerLink="/tenants">
             <i class="material-icons">account_balance</i>
-            <p>Schools</p>
+            <p>{{ 'Schools' | t }}</p>
           </a>
         </li>
         <li routerLinkActive="active" *ngIf="['SchoolAdmin','SchoolManager','PlatformSuperAdmin'].includes(auth.userRole!)">
           <a routerLink="/users">
             <i class="material-icons">people</i>
-            <p>Users</p>
+            <p>{{ 'Users' | t }}</p>
           </a>
         </li>
         <li routerLinkActive="active" *ngIf="['SchoolAdmin','SchoolManager'].includes(auth.userRole!)">
           <a routerLink="/academic/grades">
             <i class="material-icons">grade</i>
-            <p>Grades</p>
+            <p>{{ 'Grades' | t }}</p>
           </a>
         </li>
         <li routerLinkActive="active" *ngIf="['SchoolAdmin','SchoolManager'].includes(auth.userRole!)">
           <a routerLink="/academic/groups">
             <i class="material-icons">groups</i>
-            <p>Groups</p>
+            <p>{{ 'Groups' | t }}</p>
           </a>
         </li>
         <li routerLinkActive="active" *ngIf="['SchoolAdmin','SchoolManager'].includes(auth.userRole!)">
           <a routerLink="/academic/subjects">
             <i class="material-icons">menu_book</i>
-            <p>Subjects</p>
+            <p>{{ 'Subjects' | t }}</p>
           </a>
         </li>
         <li routerLinkActive="active" *ngIf="['SchoolAdmin','SchoolManager'].includes(auth.userRole!)">
           <a routerLink="/academic/semesters">
             <i class="material-icons">date_range</i>
-            <p>Semesters</p>
+            <p>{{ 'Semesters' | t }}</p>
           </a>
         </li>
         <li routerLinkActive="active" *ngIf="['SchoolAdmin','SchoolManager'].includes(auth.userRole!)">
           <a routerLink="/academic/departments">
             <i class="material-icons">business</i>
-            <p>Departments</p>
+            <p>{{ 'Departments' | t }}</p>
           </a>
         </li>
         <li routerLinkActive="active" *ngIf="['SchoolAdmin','SchoolManager'].includes(auth.userRole!)">
           <a routerLink="/rooms">
             <i class="material-icons">meeting_room</i>
-            <p>Rooms</p>
+            <p>{{ 'Rooms' | t }}</p>
           </a>
         </li>
         <li routerLinkActive="active" *ngIf="['SchoolAdmin','SchoolManager'].includes(auth.userRole!)">
           <a routerLink="/period-definitions">
             <i class="material-icons">access_time</i>
-            <p>Periods</p>
+            <p>{{ 'Periods' | t }}</p>
           </a>
         </li>
         <li routerLinkActive="active" *ngIf="['SchoolAdmin','SchoolManager'].includes(auth.userRole!)">
           <a routerLink="/curriculum">
             <i class="material-icons">auto_stories</i>
-            <p>Curriculum</p>
+            <p>{{ 'Curriculum' | t }}</p>
           </a>
         </li>
         <li routerLinkActive="active" *ngIf="['SchoolAdmin','SchoolManager'].includes(auth.userRole!)">
           <a routerLink="/teacher-subject-links">
             <i class="material-icons">link</i>
-            <p>Teacher-Subject Links</p>
+            <p>{{ 'Teacher-Subject Links' | t }}</p>
           </a>
         </li>
         <li routerLinkActive="active" *ngIf="['SchoolAdmin','SchoolManager'].includes(auth.userRole!)">
           <a routerLink="/assignments">
             <i class="material-icons">assignment</i>
-            <p>Assignments</p>
+            <p>{{ 'Assignments' | t }}</p>
           </a>
         </li>
         <li routerLinkActive="active" *ngIf="['SchoolAdmin','SchoolManager','Teacher'].includes(auth.userRole!)">
           <a routerLink="/timetable">
             <i class="material-icons">schedule</i>
-            <p>Timetable</p>
+            <p>{{ 'Timetable' | t }}</p>
           </a>
         </li>
         <li routerLinkActive="active" *ngIf="['Teacher','TeacherSupervisor','SchoolManager','SchoolAdmin','Parent'].includes(auth.userRole!)">
           <a routerLink="/attendance">
             <i class="material-icons">fact_check</i>
-            <p>Attendance</p>
+            <p>{{ 'Attendance' | t }}</p>
           </a>
         </li>
         <li routerLinkActive="active" *ngIf="['Teacher','TeacherSupervisor','SchoolManager','Parent'].includes(auth.userRole!)">
           <a routerLink="/grades-records">
             <i class="material-icons">assessment</i>
-            <p>Grade Records</p>
+            <p>{{ 'Grade Records' | t }}</p>
           </a>
         </li>
         <li routerLinkActive="active" *ngIf="['Teacher','TeacherSupervisor','SchoolManager','Parent'].includes(auth.userRole!)">
           <a routerLink="/weekly-reports">
             <i class="material-icons">summarize</i>
-            <p>Weekly Reports</p>
+            <p>{{ 'Weekly Reports' | t }}</p>
           </a>
         </li>
         <li routerLinkActive="active" *ngIf="['Teacher','TeacherSupervisor','SchoolManager','SchoolAdmin'].includes(auth.userRole!)">
           <a routerLink="/internal-reports">
             <i class="material-icons">report</i>
-            <p>Internal Reports</p>
+            <p>{{ 'Internal Reports' | t }}</p>
           </a>
         </li>
       </ul>
@@ -131,15 +131,19 @@
         <button class="navbar-toggler" (click)="toggleSidebar()">
           <i class="material-icons">menu</i>
         </button>
-        <span class="navbar-brand">{{ pageTitle }}</span>
+        <span class="navbar-brand">{{ pageTitleKey | t }}</span>
       </div>
       <div class="navbar-right">
+        <button class="btn-lang" (click)="toggleLang()" [title]="'Language' | t">
+          <i class="material-icons">language</i>
+          <span>{{ i18n.lang() === 'ar' ? 'English' : 'العربية' }}</span>
+        </button>
         <div class="user-chip">
           <i class="material-icons">person</i>
           <span class="user-name">{{ auth.currentUser?.user?.fullName }}</span>
           <span class="user-role">{{ auth.currentUser?.user?.role }}</span>
         </div>
-        <button class="btn-icon" (click)="logout()" title="Logout">
+        <button class="btn-icon" (click)="logout()" [title]="'Logout' | t">
           <i class="material-icons">exit_to_app</i>
         </button>
       </div>

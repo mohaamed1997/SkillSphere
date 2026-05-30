@@ -5,6 +5,7 @@ using SkillSphere.Application.DTOs.Attendance;
 using SkillSphere.Application.Interfaces;
 using SkillSphere.Domain.Entities;
 using SkillSphere.Domain.Enums;
+using SkillSphere.Domain.Interfaces;
 using SkillSphere.Infrastructure.Persistence;
 
 namespace SkillSphere.Infrastructure.Services;
@@ -13,15 +14,29 @@ public class AttendanceService : IAttendanceService
 {
     private readonly SkillSphereDbContext _db;
     private readonly IAuditService _audit;
+    private readonly ICurrentUserService _currentUser;
 
-    public AttendanceService(SkillSphereDbContext db, IAuditService audit)
+    public AttendanceService(SkillSphereDbContext db, IAuditService audit, ICurrentUserService currentUser)
     {
         _db = db;
         _audit = audit;
+        _currentUser = currentUser;
     }
 
     public async Task<Result<List<AttendanceRecordDto>>> GetAttendanceAsync(Guid tenantId, DateTime date, Guid? groupId, Guid? subjectId, CancellationToken ct)
     {
+        List<Guid>? parentChildIds = null;
+        if (_currentUser.Role == UserRole.Parent)
+        {
+            var userId = _currentUser.UserId ?? throw new UnauthorizedAccessException("User context required.");
+            parentChildIds = await _db.ParentLinks
+                .Where(pl => pl.ParentProfile.UserId == userId)
+                .Select(pl => pl.StudentProfileId)
+                .ToListAsync(ct);
+            if (parentChildIds.Count == 0)
+                return Result<List<AttendanceRecordDto>>.Success(new List<AttendanceRecordDto>());
+        }
+
         var q = _db.AttendanceRecords
             .Include(a => a.StudentProfile).ThenInclude(s => s.User)
             .Include(a => a.Subject)
@@ -29,6 +44,7 @@ public class AttendanceService : IAttendanceService
             .Include(a => a.TimetableEntry!).ThenInclude(e => e.PeriodDefinition)
             .Where(a => a.SchoolTenantId == tenantId && a.Date.Date == date.Date);
 
+        if (parentChildIds is not null) q = q.Where(a => parentChildIds.Contains(a.StudentProfileId));
         if (groupId.HasValue) q = q.Where(a => a.GroupId == groupId.Value);
         if (subjectId.HasValue) q = q.Where(a => a.SubjectId == subjectId.Value);
 
@@ -281,6 +297,13 @@ public class AttendanceService : IAttendanceService
 
     public async Task<Result<List<AttendanceRecordDto>>> GetStudentAttendanceAsync(Guid studentProfileId, Guid semesterId, CancellationToken ct)
     {
+        if (_currentUser.Role == UserRole.Parent)
+        {
+            var userId = _currentUser.UserId ?? throw new UnauthorizedAccessException("User context required.");
+            var isLinked = await _db.ParentLinks.AnyAsync(pl => pl.ParentProfile.UserId == userId && pl.StudentProfileId == studentProfileId, ct);
+            if (!isLinked) return Result<List<AttendanceRecordDto>>.Failure("Access denied.");
+        }
+
         var items = await _db.AttendanceRecords
             .Include(a => a.StudentProfile).ThenInclude(s => s.User)
             .Include(a => a.Subject)

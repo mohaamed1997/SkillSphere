@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { WeeklyReportService, AssignmentService, TimetableService, AcademicService } from '@core/services/data.service';
 import { AuthService } from '@core/services/auth.service';
 import { LocalDatePipe } from '@core/pipes/local-date.pipe';
+import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { StudentAssignmentDto, WeeklyReportDto, CreateWeeklyReportRequest, WeeklyReportItemRequest } from '@core/models';
 
 interface ReportItemEntry {
@@ -23,101 +24,101 @@ interface SessionOption {
 @Component({
   selector: 'app-weekly-reports',
   standalone: true,
-  imports: [CommonModule, FormsModule, LocalDatePipe],
+  imports: [CommonModule, FormsModule, LocalDatePipe, TranslatePipe],
   template: `
-    <div class="page-header"><h1>Weekly Reports</h1></div>
+    <div class="page-header"><h1>{{ 'Weekly Reports' | t }}</h1></div>
 
     <!-- ====== TABS (Teacher toggle) ====== -->
     <div class="tabs" *ngIf="isTeacher">
-      <button class="tab-btn" [class.active]="!showCreateForm" (click)="showCreateForm=false">Reports List</button>
-      <button class="tab-btn" [class.active]="showCreateForm" (click)="showCreateForm=true">+ Create Report</button>
+      <button class="tab-btn" [class.active]="!showCreateForm" (click)="showCreateForm=false">{{ 'Reports List' | t }}</button>
+      <button class="tab-btn" [class.active]="showCreateForm" (click)="showCreateForm=true">{{ '+ Create Report' | t }}</button>
     </div>
 
     <!-- ====== CREATE REPORT FORM (Teacher only) ====== -->
     <div class="card" *ngIf="isTeacher && showCreateForm">
       <div class="card-header card-header-success">
-        <h4 class="card-title">Create Weekly Report</h4>
-        <p class="card-category">Fill in assignment, student, and report items</p>
+        <h4 class="card-title">{{ 'Create Weekly Report' | t }}</h4>
+        <p class="card-category">{{ 'Fill in assignment, student, and report items' | t }}</p>
       </div>
       <div class="card-body">
         <div class="form-grid">
           <div class="form-group">
-            <label>Session (Subject / Group)</label>
+            <label>{{ 'Session (Subject / Group)' | t }}</label>
             <select [(ngModel)]="createForm.sessionIdx" (ngModelChange)="onCreateSessionChange()">
-              <option [ngValue]="-1">-- Select --</option>
+              <option [ngValue]="-1">{{ '-- Select --' | t }}</option>
               <option *ngFor="let s of sessionOptions; let i = index" [ngValue]="i">
                 {{s.label}}
               </option>
             </select>
           </div>
           <div class="form-group">
-            <label>Student</label>
+            <label>{{ 'Student' | t }}</label>
             <select [(ngModel)]="createForm.studentProfileId">
-              <option value="">-- Select --</option>
+              <option value="">{{ '-- Select --' | t }}</option>
               <option *ngFor="let s of createStudents" [value]="s.studentProfileId">{{s.studentName}}</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Week Number</label>
+            <label>{{ 'Week Number' | t }}</label>
             <input type="number" [(ngModel)]="createForm.weekNumber" min="1" max="52" placeholder="e.g. 12" />
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Week Start Date</label>
+            <label>{{ 'Week Start Date' | t }}</label>
             <input type="date" [(ngModel)]="createForm.weekStartDate" />
           </div>
           <div class="form-group">
-            <label>Week End Date</label>
+            <label>{{ 'Week End Date' | t }}</label>
             <input type="date" [(ngModel)]="createForm.weekEndDate" />
           </div>
         </div>
 
         <div class="items-section">
           <div class="items-header">
-            <h4>Report Items</h4>
-            <button class="btn btn-sm" (click)="addItem()">+ Add Item</button>
+            <h4>{{ 'Report Items' | t }}</h4>
+            <button class="btn btn-sm" (click)="addItem()">{{ '+ Add Item' | t }}</button>
           </div>
           <div class="item-card" *ngFor="let item of createForm.items; let i = index">
             <div class="item-row">
               <div class="form-group">
-                <label>Attribute</label>
+                <label>{{ 'Attribute' | t }}</label>
                 <select [(ngModel)]="item.attributeName">
-                  <option value="">-- Select --</option>
-                  <option *ngFor="let attr of defaultAttributes" [value]="attr">{{attr}}</option>
+                  <option value="">{{ '-- Select --' | t }}</option>
+                  <option *ngFor="let attr of defaultAttributes" [value]="attr">{{ attr | t }}</option>
                 </select>
               </div>
               <div class="form-group">
-                <label>Value</label>
+                <label>{{ 'Value' | t }}</label>
                 <select [(ngModel)]="item.value">
-                  <option value="">-- Select --</option>
-                  <option value="Excellent">Excellent</option>
-                  <option value="Good">Good</option>
-                  <option value="Satisfactory">Satisfactory</option>
-                  <option value="Needs Improvement">Needs Improvement</option>
-                  <option value="Poor">Poor</option>
+                  <option value="">{{ '-- Select --' | t }}</option>
+                  <option value="Excellent">{{ 'Excellent' | t }}</option>
+                  <option value="Good">{{ 'Good' | t }}</option>
+                  <option value="Satisfactory">{{ 'Satisfactory' | t }}</option>
+                  <option value="Needs Improvement">{{ 'Needs Improvement' | t }}</option>
+                  <option value="Poor">{{ 'Poor' | t }}</option>
                 </select>
               </div>
               <div class="form-group">
-                <label>Score (0-10)</label>
+                <label>{{ 'Score (0-10)' | t }}</label>
                 <input type="number" [(ngModel)]="item.numericValue" min="0" max="10" />
               </div>
-              <button class="btn-remove" (click)="removeItem(i)" title="Remove">✕</button>
+              <button class="btn-remove" (click)="removeItem(i)" [title]="'Remove' | t">✕</button>
             </div>
             <div class="form-group">
-              <label>Comments</label>
-              <input type="text" [(ngModel)]="item.comments" placeholder="Optional comments for this attribute" />
+              <label>{{ 'Comments' | t }}</label>
+              <input type="text" [(ngModel)]="item.comments" [placeholder]="'Optional comments for this attribute' | t" />
             </div>
           </div>
-          <p class="hint" *ngIf="!createForm.items.length">Click "+ Add Item" to add report attributes (e.g., Academic Performance, Behavior, Homework).</p>
+          <p class="hint" *ngIf="!createForm.items.length">{{ 'Click "+ Add Item" to add report attributes (e.g., Academic Performance, Behavior, Homework).' | t }}</p>
         </div>
 
         <div class="card-footer">
           <button class="btn btn-primary" (click)="createReport()" [disabled]="createSubmitting">
-            {{createSubmitting ? 'Saving...' : 'Save as Draft'}}
+            {{ (createSubmitting ? 'Saving...' : 'Save as Draft') | t }}
           </button>
         </div>
-        <div class="alert alert-success" *ngIf="createSuccess">Weekly report created as draft!</div>
+        <div class="alert alert-success" *ngIf="createSuccess">{{ 'Weekly report created as draft!' | t }}</div>
         <div class="alert alert-danger" *ngIf="createError">{{createError}}</div>
       </div>
     </div>
@@ -125,24 +126,24 @@ interface SessionOption {
     <!-- ====== REPORTS LIST ====== -->
     <div class="card">
       <div class="card-header card-header-info">
-        <h4 class="card-title">Weekly Reports</h4>
-        <p class="card-category">All weekly reports for your assignments</p>
+        <h4 class="card-title">{{ 'Weekly Reports' | t }}</h4>
+        <p class="card-category">{{ 'All weekly reports for your assignments' | t }}</p>
       </div>
       <div class="card-body">
         <div class="table-responsive">
           <table class="table">
-            <thead><tr><th>Student</th><th>Teacher</th><th>Week</th><th>Period</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>{{ 'Student' | t }}</th><th>{{ 'Teacher' | t }}</th><th>{{ 'Week' | t }}</th><th>{{ 'Period' | t }}</th><th>{{ 'Status' | t }}</th><th>{{ 'Actions' | t }}</th></tr></thead>
             <tbody>
               <tr *ngFor="let r of reports">
-                <td>{{r.studentName}}</td><td>{{r.teacherName}}</td><td>Week {{r.weekNumber}}</td>
+                <td>{{r.studentName}}</td><td>{{r.teacherName}}</td><td>{{ 'Week' | t }} {{r.weekNumber}}</td>
                 <td>{{r.weekStartDate | localDate:'shortDate'}} - {{r.weekEndDate | localDate:'shortDate'}}</td>
-                <td><span [class]="'badge-' + r.status.toLowerCase()">{{r.status}}</span></td>
+                <td><span [class]="'badge-' + r.status.toLowerCase()">{{ r.status | t }}</span></td>
                 <td>
-                  <button class="btn btn-sm" (click)="viewReport(r)">View</button>
-                  <button class="btn btn-sm btn-primary" *ngIf="isTeacher && r.status === 'Draft'" (click)="submitReport(r)">Submit</button>
+                  <button class="btn btn-sm" (click)="viewReport(r)">{{ 'View' | t }}</button>
+                  <button class="btn btn-sm btn-primary" *ngIf="isTeacher && r.status === 'Draft'" (click)="submitReport(r)">{{ 'Submit' | t }}</button>
                 </td>
               </tr>
-              <tr *ngIf="!reports.length"><td colspan="6" class="empty-row">No weekly reports found.</td></tr>
+              <tr *ngIf="!reports.length"><td colspan="6" class="empty-row">{{ 'No weekly reports found.' | t }}</td></tr>
             </tbody>
           </table>
         </div>
@@ -152,21 +153,21 @@ interface SessionOption {
     <!-- ====== REPORT DETAIL VIEW ====== -->
     <div class="card" *ngIf="selectedReport">
       <div class="card-header card-header-primary">
-        <h4 class="card-title">Report Details — {{selectedReport.studentName}} — Week {{selectedReport.weekNumber}}</h4>
-        <p class="card-category">{{selectedReport.subjectName}} | {{selectedReport.teacherName}} | {{selectedReport.status}}</p>
+        <h4 class="card-title">{{ 'Report Details' | t }} — {{selectedReport.studentName}} — {{ 'Week' | t }} {{selectedReport.weekNumber}}</h4>
+        <p class="card-category">{{selectedReport.subjectName}} | {{selectedReport.teacherName}} | {{ selectedReport.status | t }}</p>
       </div>
       <div class="card-body">
         <div class="detail-view">
           <div class="detail-header">
-            <h3>Report Items</h3>
-            <button class="btn btn-sm" (click)="selectedReport=null">Close</button>
+            <h3>{{ 'Report Items' | t }}</h3>
+            <button class="btn btn-sm" (click)="selectedReport=null">{{ 'Close' | t }}</button>
           </div>
           <div class="detail-grid">
             <div class="detail-item" *ngFor="let item of selectedReport.items">
-              <h4>{{item.attributeName}}</h4>
-              <p *ngIf="item.value"><strong>Value:</strong> {{item.value}}</p>
-              <p *ngIf="item.numericValue != null"><strong>Score:</strong> {{item.numericValue}}</p>
-              <p *ngIf="item.comments"><strong>Comments:</strong> {{item.comments}}</p>
+              <h4>{{ item.attributeName | t }}</h4>
+              <p *ngIf="item.value"><strong>{{ 'Value' | t }}:</strong> {{ item.value | t }}</p>
+              <p *ngIf="item.numericValue != null"><strong>{{ 'Score' | t }}:</strong> {{item.numericValue}}</p>
+              <p *ngIf="item.comments"><strong>{{ 'Comments' | t }}:</strong> {{item.comments}}</p>
             </div>
           </div>
         </div>

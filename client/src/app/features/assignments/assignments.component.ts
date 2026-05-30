@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AssignmentService, AcademicService, UserService } from '@core/services/data.service';
 import { StudentAssignmentDto, GradeDto, GroupDto, SemesterDto, BulkAssignStudentsRequest } from '@core/models';
 import { StudentProfileDto } from '@core/models';
+import { TranslatePipe } from '@core/i18n/translate.pipe';
 
 interface SelectableStudent {
   profileId: string;
@@ -15,36 +16,36 @@ interface SelectableStudent {
 @Component({
   selector: 'app-assignments',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   template: `
-    <div class="page-header"><h1>Student Assignments</h1></div>
+    <div class="page-header"><h1>{{ 'Student Assignments' | t }}</h1></div>
 
     <!-- Assign Students Card -->
     <div class="card">
       <div class="card-header card-header-success">
-        <h4 class="card-title">Assign Students to Group</h4>
-        <p class="card-category">Select a grade, group, semester, then pick students to assign</p>
+        <h4 class="card-title">{{ 'Assign Students to Group' | t }}</h4>
+        <p class="card-category">{{ 'Select a grade, group, semester, then pick students to assign' | t }}</p>
       </div>
       <div class="card-body">
         <div class="form-grid">
           <div class="form-group">
-            <label>Semester</label>
+            <label>{{ 'Semester' | t }}</label>
             <select [(ngModel)]="selectedSemesterId" (ngModelChange)="onFiltersChange()">
-              <option value="">-- Select Semester --</option>
+              <option value="">{{ '-- Select Semester --' | t }}</option>
               <option *ngFor="let s of semesters" [value]="s.id">{{s.name}}</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Grade</label>
+            <label>{{ 'Grade' | t }}</label>
             <select [(ngModel)]="selectedGradeId" (ngModelChange)="onGradeChange()">
-              <option value="">-- Select Grade --</option>
+              <option value="">{{ '-- Select Grade --' | t }}</option>
               <option *ngFor="let g of grades" [value]="g.id">{{g.name}}</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Group</label>
+            <label>{{ 'Group' | t }}</label>
             <select [(ngModel)]="selectedGroupId" (ngModelChange)="onFiltersChange()">
-              <option value="">-- Select Group --</option>
+              <option value="">{{ '-- Select Group --' | t }}</option>
               <option *ngFor="let g of filteredGroups" [value]="g.id">{{g.name}} ({{g.studentCount}}/{{g.capacity}})</option>
             </select>
           </div>
@@ -53,17 +54,17 @@ interface SelectableStudent {
         <!-- Unassigned students list -->
         <div *ngIf="selectedSemesterId && selectedGradeId && selectedGroupId">
           <div class="filter-row" style="margin:16px 0 8px">
-            <span><strong>Unassigned Students</strong> ({{unassignedStudents.length}} available)</span>
-            <input type="text" [(ngModel)]="studentSearch" placeholder="Search by name or number..." style="max-width:250px" />
-            <button class="btn btn-sm btn-outline-primary" (click)="selectAll(true)">Select All</button>
-            <button class="btn btn-sm btn-outline-secondary" (click)="selectAll(false)">Deselect All</button>
+            <span><strong>{{ 'Unassigned Students' | t }}</strong> ({{unassignedStudents.length}} {{ 'available' | t }})</span>
+            <input type="text" [(ngModel)]="studentSearch" [placeholder]="'Search by name or number...' | t" style="max-width:250px" />
+            <button class="btn btn-sm btn-outline-primary" (click)="selectAll(true)">{{ 'Select All' | t }}</button>
+            <button class="btn btn-sm btn-outline-secondary" (click)="selectAll(false)">{{ 'Deselect All' | t }}</button>
           </div>
 
-          <div *ngIf="loadingStudents" class="empty-row"><p>Loading students...</p></div>
+          <div *ngIf="loadingStudents" class="empty-row"><p>{{ 'Loading students...' | t }}</p></div>
 
           <div class="table-responsive" *ngIf="!loadingStudents && filteredUnassigned.length">
             <table class="table">
-              <thead><tr><th style="width:40px"></th><th>Name</th><th>Student Number</th></tr></thead>
+              <thead><tr><th style="width:40px"></th><th>{{ 'Name' | t }}</th><th>{{ 'Student Number' | t }}</th></tr></thead>
               <tbody>
                 <tr *ngFor="let s of filteredUnassigned" (click)="s.selected = !s.selected" style="cursor:pointer"
                     [style.background]="s.selected ? '#e8f5e9' : ''">
@@ -76,14 +77,14 @@ interface SelectableStudent {
           </div>
 
           <div class="empty-row" *ngIf="!loadingStudents && !filteredUnassigned.length">
-            <p>All students are already assigned for this semester.</p>
+            <p>{{ 'All students are already assigned for this semester.' | t }}</p>
           </div>
         </div>
       </div>
       <div class="card-footer" style="text-align:right"
            *ngIf="selectedSemesterId && selectedGradeId && selectedGroupId && selectedCount > 0">
         <button class="btn btn-primary" (click)="assignSelected()" [disabled]="submitting">
-          {{submitting ? 'Assigning...' : 'Assign ' + selectedCount + ' Student(s)'}}
+          {{ submitting ? ('Assigning...' | t) : ('Assign {count} Student(s)' | t:{ count: selectedCount }) }}
         </button>
       </div>
       <div class="alert alert-success" *ngIf="successMsg" style="margin:0 16px 16px">{{successMsg}}</div>
@@ -93,29 +94,29 @@ interface SelectableStudent {
     <!-- Current Assignments Card -->
     <div class="card">
       <div class="card-header card-header-warning">
-        <h4 class="card-title">Current Assignments</h4>
-        <p class="card-category">Students assigned to groups for the selected semester</p>
+        <h4 class="card-title">{{ 'Current Assignments' | t }}</h4>
+        <p class="card-category">{{ 'Students assigned to groups for the selected semester' | t }}</p>
       </div>
       <div class="card-body">
         <div class="filter-row" style="margin-bottom:12px">
           <div class="form-group">
-            <label>Filter by Semester</label>
+            <label>{{ 'Filter by Semester' | t }}</label>
             <select [(ngModel)]="filterSemesterId" (ngModelChange)="loadAssignments()">
-              <option value="">All Semesters</option>
+              <option value="">{{ 'All Semesters' | t }}</option>
               <option *ngFor="let s of semesters" [value]="s.id">{{s.name}}</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Filter by Grade</label>
+            <label>{{ 'Filter by Grade' | t }}</label>
             <select [(ngModel)]="filterGradeId" (ngModelChange)="loadAssignments()">
-              <option value="">All Grades</option>
+              <option value="">{{ 'All Grades' | t }}</option>
               <option *ngFor="let g of grades" [value]="g.id">{{g.name}}</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Filter by Group</label>
+            <label>{{ 'Filter by Group' | t }}</label>
             <select [(ngModel)]="filterGroupId" (ngModelChange)="loadAssignments()">
-              <option value="">All Groups</option>
+              <option value="">{{ 'All Groups' | t }}</option>
               <option *ngFor="let g of allGroups" [value]="g.id">{{g.name}}</option>
             </select>
           </div>
@@ -123,20 +124,20 @@ interface SelectableStudent {
 
         <div class="table-responsive" *ngIf="assignments.length">
           <table class="table">
-            <thead><tr><th>Student</th><th>Grade</th><th>Group</th><th>Semester</th><th>Actions</th></tr></thead>
+            <thead><tr><th>{{ 'Student' | t }}</th><th>{{ 'Grade' | t }}</th><th>{{ 'Group' | t }}</th><th>{{ 'Semester' | t }}</th><th>{{ 'Actions' | t }}</th></tr></thead>
             <tbody>
               <tr *ngFor="let a of assignments">
                 <td>{{a.studentName}}</td>
                 <td>{{a.gradeName}}</td>
                 <td>{{a.groupName}}</td>
                 <td>{{a.semesterName}}</td>
-                <td><button class="btn btn-sm btn-danger" (click)="removeAssignment(a.id)">Remove</button></td>
+                <td><button class="btn btn-sm btn-danger" (click)="removeAssignment(a.id)">{{ 'Remove' | t }}</button></td>
               </tr>
             </tbody>
           </table>
         </div>
         <div class="empty-row" *ngIf="!assignments.length">
-          <p>No assignments found for the selected filters.</p>
+          <p>{{ 'No assignments found for the selected filters.' | t }}</p>
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractContro
 import { HttpErrorResponse } from '@angular/common/http';
 import { TenantService } from '@core/services/data.service';
 import { TenantDto } from '@core/models';
+import { TranslatePipe } from '@core/i18n/translate.pipe';
 
 interface CountryCode { name: string; dial: string; code: string; phonePlaceholder: string; phonePattern: RegExp; }
 
@@ -37,11 +38,11 @@ const COUNTRY_CODES: CountryCode[] = [
 @Component({
   selector: 'app-tenant-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   template: `
     <div class="page-header">
-      <h1>Schools (Tenants)</h1>
-      <button class="btn btn-primary" (click)="toggleForm()">{{ showForm ? 'Cancel' : '+ Add School' }}</button>
+      <h1>{{ 'Schools (Tenants)' | t }}</h1>
+      <button class="btn btn-primary" (click)="toggleForm()">{{ (showForm ? 'Cancel' : '+ Add School') | t }}</button>
     </div>
 
     <div class="alert alert-danger" *ngIf="errorMessage">
@@ -58,79 +59,79 @@ const COUNTRY_CODES: CountryCode[] = [
 
     <div class="card form-card" *ngIf="showForm">
       <div class="card-header card-header-info">
-        <h4 class="card-title">Onboard New School</h4>
-        <p class="card-category">Fill in the details to create a new school tenant</p>
+        <h4 class="card-title">{{ 'Onboard New School' | t }}</h4>
+        <p class="card-category">{{ 'Fill in the details to create a new school tenant' | t }}</p>
       </div>
       <div class="card-body">
         <form [formGroup]="schoolForm" (ngSubmit)="create()">
           <!-- School Info -->
-          <div class="form-section-title">School Information</div>
+          <div class="form-section-title">{{ 'School Information' | t }}</div>
           <div class="form-row">
             <div class="form-group">
-              <label>School Name <span class="required">*</span></label>
-              <input formControlName="name" placeholder="e.g. Al Abtal Academy" />
+              <label>{{ 'School Name' | t }} <span class="required">*</span></label>
+              <input formControlName="name" [placeholder]="'e.g. Al Abtal Academy' | t" />
               <div class="field-error" *ngIf="showError('name')">
-                <span *ngIf="schoolForm.get('name')?.errors?.['required']">School name is required.</span>
-                <span *ngIf="schoolForm.get('name')?.errors?.['minlength']">Must be at least 2 characters.</span>
-                <span *ngIf="schoolForm.get('name')?.errors?.['maxlength']">Must be under 100 characters.</span>
+                <span *ngIf="schoolForm.get('name')?.errors?.['required']">{{ 'School name is required.' | t }}</span>
+                <span *ngIf="schoolForm.get('name')?.errors?.['minlength']">{{ 'Must be at least 2 characters.' | t }}</span>
+                <span *ngIf="schoolForm.get('name')?.errors?.['maxlength']">{{ 'Must be under 100 characters.' | t }}</span>
               </div>
             </div>
             <div class="form-group">
-              <label>Subdomain / Code <span class="required">*</span></label>
-              <input formControlName="code" placeholder="e.g. al-abtal" />
-              <div class="field-hint" *ngIf="!showError('code')">Lowercase letters, numbers, and hyphens only.</div>
+              <label>{{ 'Subdomain / Code' | t }} <span class="required">*</span></label>
+              <input formControlName="code" [placeholder]="'e.g. al-abtal' | t" />
+              <div class="field-hint" *ngIf="!showError('code')">{{ 'Lowercase letters, numbers, and hyphens only.' | t }}</div>
               <div class="field-error" *ngIf="showError('code')">
-                <span *ngIf="schoolForm.get('code')?.errors?.['required']">Subdomain code is required.</span>
-                <span *ngIf="schoolForm.get('code')?.errors?.['minlength']">Must be at least 3 characters.</span>
-                <span *ngIf="schoolForm.get('code')?.errors?.['maxlength']">Must be under 50 characters.</span>
-                <span *ngIf="schoolForm.get('code')?.errors?.['pattern']">Only lowercase letters, numbers, and hyphens allowed.</span>
+                <span *ngIf="schoolForm.get('code')?.errors?.['required']">{{ 'Subdomain code is required.' | t }}</span>
+                <span *ngIf="schoolForm.get('code')?.errors?.['minlength']">{{ 'Must be at least 3 characters.' | t }}</span>
+                <span *ngIf="schoolForm.get('code')?.errors?.['maxlength']">{{ 'Must be under 50 characters.' | t }}</span>
+                <span *ngIf="schoolForm.get('code')?.errors?.['pattern']">{{ 'Only lowercase letters, numbers, and hyphens allowed.' | t }}</span>
               </div>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Contact Email</label>
+              <label>{{ 'Contact Email' | t }}</label>
               <input formControlName="email" type="email" placeholder="e.g. info&#64;school.com" />
               <div class="field-error" *ngIf="showError('email')">
-                <span *ngIf="schoolForm.get('email')?.errors?.['email']">Enter a valid email address.</span>
+                <span *ngIf="schoolForm.get('email')?.errors?.['email']">{{ 'Enter a valid email address.' | t }}</span>
               </div>
             </div>
             <div class="form-group">
-              <label>Phone</label>
+              <label>{{ 'Phone' | t }}</label>
               <div class="phone-input-group">
                 <select formControlName="countryCode" class="country-select">
-                  <option value="">Country</option>
+                  <option value="">{{ 'Country' | t }}</option>
                   <option *ngFor="let c of countries" [value]="c.code">{{ c.name }} ({{ c.dial }})</option>
                 </select>
                 <input formControlName="phoneNumber" class="phone-number-input"
-                       [placeholder]="selectedCountry?.phonePlaceholder || 'Phone number'" />
+                       [placeholder]="selectedCountry?.phonePlaceholder || ('Phone number' | t)" />
               </div>
               <div class="field-error" *ngIf="showError('phoneNumber')">
                 <span *ngIf="schoolForm.get('phoneNumber')?.errors?.['invalidPhone']">
-                  Invalid phone number for {{ selectedCountry?.name || 'selected country' }}.
+                  {{ 'Invalid phone number for {country}.' | t:{ country: selectedCountry?.name || ('selected country' | t) } }}
                 </span>
               </div>
               <div class="field-error" *ngIf="schoolForm.get('phoneNumber')?.value && !schoolForm.get('countryCode')?.value">
-                <span>Please select a country first.</span>
+                <span>{{ 'Please select a country first.' | t }}</span>
               </div>
             </div>
           </div>
 
           <!-- Admin Account -->
-          <div class="form-section-title">Admin Account</div>
+          <div class="form-section-title">{{ 'Admin Account' | t }}</div>
           <div class="form-row">
             <div class="form-group">
-              <label>Admin Email <span class="required">*</span></label>
+              <label>{{ 'Admin Email' | t }} <span class="required">*</span></label>
               <input formControlName="adminEmail" type="email" placeholder="e.g. admin&#64;school.com" />
               <div class="field-error" *ngIf="showError('adminEmail')">
-                <span *ngIf="schoolForm.get('adminEmail')?.errors?.['required']">Admin email is required.</span>
-                <span *ngIf="schoolForm.get('adminEmail')?.errors?.['email']">Enter a valid email address.</span>
+                <span *ngIf="schoolForm.get('adminEmail')?.errors?.['required']">{{ 'Admin email is required.' | t }}</span>
+                <span *ngIf="schoolForm.get('adminEmail')?.errors?.['email']">{{ 'Enter a valid email address.' | t }}</span>
               </div>
             </div>
             <div class="form-group">
-              <label>Admin Password <span class="required">*</span></label>
+              <label>{{ 'Admin Password' | t }} <span class="required">*</span></label>
               <div class="password-wrapper">
-                <input formControlName="adminPassword" [type]="showPassword ? 'text' : 'password'" placeholder="Min 8 chars, uppercase, number, symbol" />
+                <input formControlName="adminPassword" [type]="showPassword ? 'text' : 'password'" [placeholder]="'Min 8 chars, uppercase, number, symbol' | t" />
                 <button type="button" class="toggle-password" (click)="showPassword = !showPassword">
                   {{ showPassword ? '🙈' : '👁' }}
                 </button>
@@ -139,40 +140,40 @@ const COUNTRY_CODES: CountryCode[] = [
                 <div class="strength-bar">
                   <div class="strength-fill" [style.width.%]="passwordStrength" [class]="passwordStrengthClass"></div>
                 </div>
-                <span class="strength-label" [class]="passwordStrengthClass">{{ passwordStrengthLabel }}</span>
+                <span class="strength-label" [class]="passwordStrengthClass">{{ passwordStrengthLabel | t }}</span>
               </div>
               <div class="field-error" *ngIf="showError('adminPassword')">
-                <span *ngIf="schoolForm.get('adminPassword')?.errors?.['required']">Password is required.</span>
-                <span *ngIf="schoolForm.get('adminPassword')?.errors?.['minlength']">Must be at least 8 characters.</span>
+                <span *ngIf="schoolForm.get('adminPassword')?.errors?.['required']">{{ 'Password is required.' | t }}</span>
+                <span *ngIf="schoolForm.get('adminPassword')?.errors?.['minlength']">{{ 'Must be at least 8 characters.' | t }}</span>
                 <span *ngIf="schoolForm.get('adminPassword')?.errors?.['passwordStrength']">
-                  {{ schoolForm.get('adminPassword')?.errors?.['passwordStrength'] }}
+                  {{ schoolForm.get('adminPassword')?.errors?.['passwordStrength'] | t }}
                 </span>
               </div>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Admin First Name <span class="required">*</span></label>
-              <input formControlName="adminFirstName" placeholder="e.g. Ahmed" />
+              <label>{{ 'Admin First Name' | t }} <span class="required">*</span></label>
+              <input formControlName="adminFirstName" [placeholder]="'e.g. Ahmed' | t" />
               <div class="field-error" *ngIf="showError('adminFirstName')">
-                <span *ngIf="schoolForm.get('adminFirstName')?.errors?.['required']">First name is required.</span>
-                <span *ngIf="schoolForm.get('adminFirstName')?.errors?.['minlength']">Must be at least 2 characters.</span>
-                <span *ngIf="schoolForm.get('adminFirstName')?.errors?.['maxlength']">Must be under 50 characters.</span>
+                <span *ngIf="schoolForm.get('adminFirstName')?.errors?.['required']">{{ 'First name is required.' | t }}</span>
+                <span *ngIf="schoolForm.get('adminFirstName')?.errors?.['minlength']">{{ 'Must be at least 2 characters.' | t }}</span>
+                <span *ngIf="schoolForm.get('adminFirstName')?.errors?.['maxlength']">{{ 'Must be under 50 characters.' | t }}</span>
               </div>
             </div>
             <div class="form-group">
-              <label>Admin Last Name <span class="required">*</span></label>
-              <input formControlName="adminLastName" placeholder="e.g. Fahmy" />
+              <label>{{ 'Admin Last Name' | t }} <span class="required">*</span></label>
+              <input formControlName="adminLastName" [placeholder]="'e.g. Fahmy' | t" />
               <div class="field-error" *ngIf="showError('adminLastName')">
-                <span *ngIf="schoolForm.get('adminLastName')?.errors?.['required']">Last name is required.</span>
-                <span *ngIf="schoolForm.get('adminLastName')?.errors?.['minlength']">Must be at least 2 characters.</span>
-                <span *ngIf="schoolForm.get('adminLastName')?.errors?.['maxlength']">Must be under 50 characters.</span>
+                <span *ngIf="schoolForm.get('adminLastName')?.errors?.['required']">{{ 'Last name is required.' | t }}</span>
+                <span *ngIf="schoolForm.get('adminLastName')?.errors?.['minlength']">{{ 'Must be at least 2 characters.' | t }}</span>
+                <span *ngIf="schoolForm.get('adminLastName')?.errors?.['maxlength']">{{ 'Must be under 50 characters.' | t }}</span>
               </div>
             </div>
           </div>
 
           <button type="submit" class="btn btn-primary btn-submit" [disabled]="creating || schoolForm.invalid">
-            {{ creating ? 'Creating...' : 'Create School' }}
+            {{ (creating ? 'Creating...' : 'Create School') | t }}
           </button>
         </form>
       </div>
@@ -180,27 +181,27 @@ const COUNTRY_CODES: CountryCode[] = [
 
     <div class="card">
       <div class="card-header card-header-rose">
-        <h4 class="card-title">Schools</h4>
-        <p class="card-category">Manage school tenants</p>
+        <h4 class="card-title">{{ 'Schools' | t }}</h4>
+        <p class="card-category">{{ 'Manage school tenants' | t }}</p>
       </div>
       <div class="card-body">
         <div class="table-responsive">
           <table class="table">
-            <thead><tr><th>School Name</th><th>Subdomain</th><th>Email</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>{{ 'School Name' | t }}</th><th>{{ 'Subdomain' | t }}</th><th>{{ 'Email' | t }}</th><th>{{ 'Phone' | t }}</th><th>{{ 'Status' | t }}</th><th>{{ 'Actions' | t }}</th></tr></thead>
             <tbody>
               <tr *ngFor="let t of tenants">
                 <td>{{ t.name }}</td>
                 <td>{{ t.code }}</td>
                 <td>{{ t.email || '—' }}</td>
                 <td>{{ t.phone || '—' }}</td>
-                <td><span [class]="t.isActive ? 'badge-active' : 'badge-inactive'">{{ t.isActive ? 'Active' : 'Inactive' }}</span></td>
+                <td><span [class]="t.isActive ? 'badge-active' : 'badge-inactive'">{{ (t.isActive ? 'Active' : 'Inactive') | t }}</span></td>
                 <td>
-                  <button class="btn btn-sm btn-danger" (click)="deactivate(t.id)" *ngIf="t.isActive">Deactivate</button>
-                  <button class="btn btn-sm btn-success" (click)="reactivate(t.id)" *ngIf="!t.isActive">Reactivate</button>
+                  <button class="btn btn-sm btn-danger" (click)="deactivate(t.id)" *ngIf="t.isActive">{{ 'Deactivate' | t }}</button>
+                  <button class="btn btn-sm btn-success" (click)="reactivate(t.id)" *ngIf="!t.isActive">{{ 'Reactivate' | t }}</button>
                 </td>
               </tr>
               <tr *ngIf="tenants.length === 0">
-                <td colspan="6" class="empty-row">No schools found. Click "+ Add School" to create one.</td>
+                <td colspan="6" class="empty-row">{{ 'No schools found. Click "+ Add School" to create one.' | t }}</td>
               </tr>
             </tbody>
           </table>

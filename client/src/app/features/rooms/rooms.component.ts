@@ -4,35 +4,36 @@ import { FormsModule } from '@angular/forms';
 import { RoomService } from '@core/services/data.service';
 import { RoomDto } from '@core/models';
 import { RoomType } from '@core/models/enums';
+import { TranslatePipe } from '@core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-rooms',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   template: `
-    <div class="page-header"><h1>Rooms</h1>
-      <button class="btn btn-primary" (click)="showForm=!showForm">{{ showForm ? 'Cancel' : '+ Add Room' }}</button>
+    <div class="page-header"><h1>{{ 'Rooms' | t }}</h1>
+      <button class="btn btn-primary" (click)="showForm=!showForm">{{ (showForm ? 'Cancel' : '+ Add Room') | t }}</button>
     </div>
 
     <div class="card" *ngIf="showForm">
       <div class="card-header card-header-info">
-        <h4 class="card-title">{{ editId ? 'Edit' : 'Add' }} Room</h4>
+        <h4 class="card-title">{{ (editId ? 'Edit Room' : 'Add Room') | t }}</h4>
       </div>
       <div class="card-body">
         <div class="form-row">
-          <div class="form-group"><label>Code</label><input [(ngModel)]="form.code" placeholder="e.g. Room101" /></div>
-          <div class="form-group"><label>Name</label><input [(ngModel)]="form.name" placeholder="e.g. Room 101" /></div>
-          <div class="form-group"><label>Type</label>
+          <div class="form-group"><label>{{ 'Code' | t }}</label><input [(ngModel)]="form.code" [placeholder]="'e.g. Room101' | t" /></div>
+          <div class="form-group"><label>{{ 'Name' | t }}</label><input [(ngModel)]="form.name" [placeholder]="'e.g. Room 101' | t" /></div>
+          <div class="form-group"><label>{{ 'Type' | t }}</label>
             <select [(ngModel)]="form.roomType">
               <option *ngFor="let t of roomTypes" [value]="t">{{t}}</option>
             </select>
           </div>
-          <div class="form-group"><label>Building</label><input [(ngModel)]="form.building" placeholder="e.g. Main Building" /></div>
-          <div class="form-group"><label>Floor</label><input type="number" [(ngModel)]="form.floor" /></div>
-          <div class="form-group"><label>Capacity</label><input type="number" [(ngModel)]="form.capacity" /></div>
+          <div class="form-group"><label>{{ 'Building' | t }}</label><input [(ngModel)]="form.building" [placeholder]="'e.g. Main Building' | t" /></div>
+          <div class="form-group"><label>{{ 'Floor' | t }}</label><input type="number" [(ngModel)]="form.floor" /></div>
+          <div class="form-group"><label>{{ 'Capacity' | t }}</label><input type="number" [(ngModel)]="form.capacity" /></div>
         </div>
-        <button class="btn btn-primary" (click)="save()">Save</button>
-        <button class="btn btn-default" (click)="cancelEdit()">Cancel</button>
+        <button class="btn btn-primary" (click)="save()">{{ 'Save' | t }}</button>
+        <button class="btn btn-default" (click)="cancelEdit()">{{ 'Cancel' | t }}</button>
       </div>
     </div>
 
@@ -40,9 +41,9 @@ import { RoomType } from '@core/models/enums';
     <div class="card">
       <div class="card-body">
         <div class="form-row">
-          <div class="form-group"><label>Filter by Type</label>
+          <div class="form-group"><label>{{ 'Filter by Type' | t }}</label>
             <select [(ngModel)]="filterType" (ngModelChange)="load()">
-              <option value="">All Types</option>
+              <option value="">{{ 'All Types' | t }}</option>
               <option *ngFor="let t of roomTypes" [value]="t">{{t}}</option>
             </select>
           </div>
@@ -52,19 +53,19 @@ import { RoomType } from '@core/models/enums';
 
     <div class="card">
       <div class="card-header card-header-info">
-        <h4 class="card-title">All Rooms</h4>
-        <p class="card-category">{{items.length}} room(s)</p>
+        <h4 class="card-title">{{ 'All Rooms' | t }}</h4>
+        <p class="card-category">{{ '{count} room(s)' | t:{ count: items.length } }}</p>
       </div>
       <div class="card-body">
         <div class="table-responsive">
           <table class="table">
-            <thead><tr><th>Code</th><th>Name</th><th>Type</th><th>Building</th><th>Floor</th><th>Capacity</th><th>Actions</th></tr></thead>
+            <thead><tr><th>{{ 'Code' | t }}</th><th>{{ 'Name' | t }}</th><th>{{ 'Type' | t }}</th><th>{{ 'Building' | t }}</th><th>{{ 'Floor' | t }}</th><th>{{ 'Capacity' | t }}</th><th>{{ 'Actions' | t }}</th></tr></thead>
             <tbody>
               <tr *ngFor="let r of items">
                 <td>{{r.code}}</td><td>{{r.name}}</td><td>{{r.roomType}}</td><td>{{r.building ?? '-'}}</td><td>{{r.floor ?? '-'}}</td><td>{{r.capacity ?? '-'}}</td>
                 <td>
-                  <button class="btn btn-sm btn-info" (click)="edit(r)">Edit</button>
-                  <button class="btn btn-sm btn-danger" (click)="remove(r.id)">Delete</button>
+                  <button class="btn btn-sm btn-info" (click)="edit(r)">{{ 'Edit' | t }}</button>
+                  <button class="btn btn-sm btn-danger" (click)="remove(r.id)">{{ 'Delete' | t }}</button>
                 </td>
               </tr>
             </tbody>

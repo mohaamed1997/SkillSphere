@@ -2,41 +2,42 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AcademicService } from '@core/services/data.service';
+import { TranslatePipe } from '@core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-classes',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   template: `
     <div class="card" *ngIf="showForm">
       <div class="card-header card-header-info">
-        <h4 class="card-title">Add Group</h4>
-        <p class="card-category">Create a new group</p>
+        <h4 class="card-title">{{ 'Add Group' | t }}</h4>
+        <p class="card-category">{{ 'Create a new group' | t }}</p>
       </div>
       <div class="card-body">
         <div class="form-row">
-          <div class="form-group"><label>Name</label><input [(ngModel)]="form.name" /></div>
-          <div class="form-group"><label>Grade</label>
-            <select [(ngModel)]="form.gradeId"><option value="">Select</option><option *ngFor="let g of grades" [value]="g.id">{{g.name}}</option></select>
+          <div class="form-group"><label>{{ 'Name' | t }}</label><input [(ngModel)]="form.name" /></div>
+          <div class="form-group"><label>{{ 'Grade' | t }}</label>
+            <select [(ngModel)]="form.gradeId"><option value="">{{ 'Select' | t }}</option><option *ngFor="let g of grades" [value]="g.id">{{g.name}}</option></select>
           </div>
-          <div class="form-group"><label>Capacity</label><input type="number" [(ngModel)]="form.capacity" /></div>
+          <div class="form-group"><label>{{ 'Capacity' | t }}</label><input type="number" [(ngModel)]="form.capacity" /></div>
         </div>
-        <button class="btn btn-primary" (click)="save()">Save</button>
-        <button class="btn btn-default" (click)="showForm=false">Cancel</button>
+        <button class="btn btn-primary" (click)="save()">{{ 'Save' | t }}</button>
+        <button class="btn btn-default" (click)="showForm=false">{{ 'Cancel' | t }}</button>
       </div>
     </div>
     <div class="card">
       <div class="card-header card-header-info">
-        <h4 class="card-title">Groups</h4>
-        <p class="card-category">Manage groups</p>
+        <h4 class="card-title">{{ 'Groups' | t }}</h4>
+        <p class="card-category">{{ 'Manage groups' | t }}</p>
       </div>
       <div class="card-body">
-        <button class="btn btn-primary" (click)="showForm=!showForm" style="margin-bottom:15px">{{ showForm ? 'Cancel' : '+ Add' }}</button>
+        <button class="btn btn-primary" (click)="showForm=!showForm" style="margin-bottom:15px">{{ (showForm ? 'Cancel' : '+ Add') | t }}</button>
         <div class="table-responsive">
           <table class="table">
-            <thead><tr><th>Name</th><th>Grade</th><th>Capacity</th><th>Actions</th></tr></thead>
+            <thead><tr><th>{{ 'Name' | t }}</th><th>{{ 'Grade' | t }}</th><th>{{ 'Capacity' | t }}</th><th>{{ 'Actions' | t }}</th></tr></thead>
             <tbody><tr *ngFor="let c of items"><td>{{c.name}}</td><td>{{c.gradeName}}</td><td>{{c.capacity}}</td>
-              <td><button class="btn btn-sm btn-danger" (click)="remove(c.id)">Delete</button></td></tr></tbody>
+              <td><button class="btn btn-sm btn-danger" (click)="remove(c.id)">{{ 'Delete' | t }}</button></td></tr></tbody>
           </table>
         </div>
       </div>

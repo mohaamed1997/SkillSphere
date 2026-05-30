@@ -4,6 +4,7 @@ using SkillSphere.Application.DTOs.Reports;
 using SkillSphere.Application.Interfaces;
 using SkillSphere.Domain.Entities;
 using SkillSphere.Domain.Enums;
+using SkillSphere.Domain.Interfaces;
 using SkillSphere.Infrastructure.Persistence;
 
 namespace SkillSphere.Infrastructure.Services;
@@ -11,16 +12,44 @@ namespace SkillSphere.Infrastructure.Services;
 public class WeeklyReportService : IWeeklyReportService
 {
     private readonly SkillSphereDbContext _db;
-    public WeeklyReportService(SkillSphereDbContext db) => _db = db;
+    private readonly ICurrentUserService _currentUser;
+    public WeeklyReportService(SkillSphereDbContext db, ICurrentUserService currentUser)
+    {
+        _db = db;
+        _currentUser = currentUser;
+    }
 
     public async Task<Result<PagedResult<WeeklyReportDto>>> GetReportsAsync(Guid tenantId, Guid? semesterId, Guid? teacherId, Guid? studentId, int? weekNumber, PaginationParams? p, CancellationToken ct)
     {
         p ??= new PaginationParams();
+
+        List<Guid>? parentChildIds = null;
+        if (_currentUser.Role == UserRole.Parent)
+        {
+            var userId = _currentUser.UserId ?? throw new UnauthorizedAccessException("User context required.");
+            parentChildIds = await _db.ParentLinks
+                .Where(pl => pl.ParentProfile.UserId == userId)
+                .Select(pl => pl.StudentProfileId)
+                .ToListAsync(ct);
+
+            if (parentChildIds.Count == 0)
+                return Result<PagedResult<WeeklyReportDto>>.Success(new PagedResult<WeeklyReportDto>
+                { Items = new List<WeeklyReportDto>(), TotalCount = 0, Page = p.Page, PageSize = p.PageSize });
+
+            if (studentId.HasValue && !parentChildIds.Contains(studentId.Value))
+                return Result<PagedResult<WeeklyReportDto>>.Failure("Access denied.");
+        }
+
         var q = _db.WeeklyReports
             .Include(r => r.StudentProfile).ThenInclude(s => s.User)
             .Include(r => r.TeacherProfile).ThenInclude(t => t.User)
             .Include(r => r.Subject).Include(r => r.Semester).Include(r => r.Items)
             .Where(r => r.SchoolTenantId == tenantId);
+
+        if (parentChildIds is not null)
+        {
+            q = q.Where(r => parentChildIds.Contains(r.StudentProfileId) && r.Status >= WeeklyReportStatus.Submitted);
+        }
 
         if (semesterId.HasValue) q = q.Where(r => r.SemesterId == semesterId.Value);
         if (teacherId.HasValue) q = q.Where(r => r.TeacherProfileId == teacherId.Value);
@@ -45,7 +74,17 @@ public class WeeklyReportService : IWeeklyReportService
             .Include(r => r.Subject).Include(r => r.Semester).Include(r => r.Items)
             .FirstOrDefaultAsync(r => r.Id == id, ct);
 
-        return r == null ? Result<WeeklyReportDto>.Failure("Report not found.") : Result<WeeklyReportDto>.Success(MapDto(r));
+        if (r == null) return Result<WeeklyReportDto>.Failure("Report not found.");
+
+        if (_currentUser.Role == UserRole.Parent)
+        {
+            var userId = _currentUser.UserId ?? throw new UnauthorizedAccessException("User context required.");
+            var isLinked = await _db.ParentLinks.AnyAsync(pl => pl.ParentProfile.UserId == userId && pl.StudentProfileId == r.StudentProfileId, ct);
+            if (!isLinked || r.Status < WeeklyReportStatus.Submitted)
+                return Result<WeeklyReportDto>.Failure("Access denied.");
+        }
+
+        return Result<WeeklyReportDto>.Success(MapDto(r));
     }
 
     public async Task<Result<WeeklyReportDto>> CreateAsync(Guid tenantId, Guid teacherProfileId, CreateWeeklyReportRequest req, CancellationToken ct)

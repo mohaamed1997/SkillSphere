@@ -3,6 +3,8 @@ using SkillSphere.Application.Common;
 using SkillSphere.Application.DTOs.Grades;
 using SkillSphere.Application.Interfaces;
 using SkillSphere.Domain.Entities;
+using SkillSphere.Domain.Enums;
+using SkillSphere.Domain.Interfaces;
 using SkillSphere.Infrastructure.Persistence;
 
 namespace SkillSphere.Infrastructure.Services;
@@ -10,15 +12,70 @@ namespace SkillSphere.Infrastructure.Services;
 public class GradeRecordService : IGradeRecordService
 {
     private readonly SkillSphereDbContext _db;
-    public GradeRecordService(SkillSphereDbContext db) => _db = db;
+    private readonly ICurrentUserService _currentUser;
+    public GradeRecordService(SkillSphereDbContext db, ICurrentUserService currentUser)
+    {
+        _db = db;
+        _currentUser = currentUser;
+    }
+
+    private async Task<List<Guid>?> GetParentLinkedStudentIdsAsync(CancellationToken ct)
+    {
+        if (_currentUser.Role != UserRole.Parent) return null;
+        var userId = _currentUser.UserId ?? throw new UnauthorizedAccessException("User context required.");
+        return await _db.ParentLinks
+            .Where(pl => pl.ParentProfile.UserId == userId)
+            .Select(pl => pl.StudentProfileId)
+            .ToListAsync(ct);
+    }
+
+    private async Task<List<Guid>?> GetTeacherTaughtStudentIdsAsync(CancellationToken ct)
+    {
+        if (_currentUser.Role != UserRole.Teacher) return null;
+        var userId = _currentUser.UserId ?? throw new UnauthorizedAccessException("User context required.");
+
+        // Groups the teacher teaches via published timetable entries (any subject)
+        var groupIds = await _db.TimetableEntries
+            .Where(e => e.TeacherProfile.UserId == userId)
+            .Select(e => e.TimetableVersion.GroupId)
+            .Distinct()
+            .ToListAsync(ct);
+
+        if (groupIds.Count == 0) return new List<Guid>();
+
+        // Students currently assigned to those groups
+        return await _db.StudentAssignments
+            .Where(sa => sa.IsActive && groupIds.Contains(sa.GroupId))
+            .Select(sa => sa.StudentProfileId)
+            .Distinct()
+            .ToListAsync(ct);
+    }
 
     public async Task<Result<List<GradeRecordDto>>> GetGradeRecordsAsync(Guid tenantId, Guid? studentId, Guid? subjectId, Guid? semesterId, CancellationToken ct)
     {
+        var parentChildIds = await GetParentLinkedStudentIdsAsync(ct);
+        if (parentChildIds is not null)
+        {
+            if (parentChildIds.Count == 0) return Result<List<GradeRecordDto>>.Success(new List<GradeRecordDto>());
+            if (studentId.HasValue && !parentChildIds.Contains(studentId.Value))
+                return Result<List<GradeRecordDto>>.Failure("Access denied.");
+        }
+
+        var teacherStudentIds = await GetTeacherTaughtStudentIdsAsync(ct);
+        if (teacherStudentIds is not null)
+        {
+            if (teacherStudentIds.Count == 0) return Result<List<GradeRecordDto>>.Success(new List<GradeRecordDto>());
+            if (studentId.HasValue && !teacherStudentIds.Contains(studentId.Value))
+                return Result<List<GradeRecordDto>>.Failure("Access denied.");
+        }
+
         var q = _db.GradeRecords
             .Include(g => g.StudentProfile).ThenInclude(s => s.User)
             .Include(g => g.Subject)
             .Where(g => g.SchoolTenantId == tenantId);
 
+        if (parentChildIds is not null) q = q.Where(g => parentChildIds.Contains(g.StudentProfileId));
+        if (teacherStudentIds is not null) q = q.Where(g => teacherStudentIds.Contains(g.StudentProfileId));
         if (studentId.HasValue) q = q.Where(g => g.StudentProfileId == studentId.Value);
         if (subjectId.HasValue) q = q.Where(g => g.SubjectId == subjectId.Value);
         if (semesterId.HasValue) q = q.Where(g => g.SemesterId == semesterId.Value);
@@ -69,10 +126,28 @@ public class GradeRecordService : IGradeRecordService
 
     public async Task<Result<List<BehaviorFeedbackDto>>> GetBehaviorFeedbackAsync(Guid tenantId, Guid? studentId, Guid? semesterId, CancellationToken ct)
     {
+        var parentChildIds = await GetParentLinkedStudentIdsAsync(ct);
+        if (parentChildIds is not null)
+        {
+            if (parentChildIds.Count == 0) return Result<List<BehaviorFeedbackDto>>.Success(new List<BehaviorFeedbackDto>());
+            if (studentId.HasValue && !parentChildIds.Contains(studentId.Value))
+                return Result<List<BehaviorFeedbackDto>>.Failure("Access denied.");
+        }
+
+        var teacherStudentIds = await GetTeacherTaughtStudentIdsAsync(ct);
+        if (teacherStudentIds is not null)
+        {
+            if (teacherStudentIds.Count == 0) return Result<List<BehaviorFeedbackDto>>.Success(new List<BehaviorFeedbackDto>());
+            if (studentId.HasValue && !teacherStudentIds.Contains(studentId.Value))
+                return Result<List<BehaviorFeedbackDto>>.Failure("Access denied.");
+        }
+
         var q = _db.BehaviorFeedbacks
             .Include(b => b.StudentProfile).ThenInclude(s => s.User)
             .Where(b => b.SchoolTenantId == tenantId);
 
+        if (parentChildIds is not null) q = q.Where(b => parentChildIds.Contains(b.StudentProfileId));
+        if (teacherStudentIds is not null) q = q.Where(b => teacherStudentIds.Contains(b.StudentProfileId));
         if (studentId.HasValue) q = q.Where(b => b.StudentProfileId == studentId.Value);
         if (semesterId.HasValue) q = q.Where(b => b.SemesterId == semesterId.Value);
 

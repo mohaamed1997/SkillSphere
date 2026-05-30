@@ -9,7 +9,7 @@ namespace SkillSphere.API.Controllers;
 
 [ApiController]
 [Route("api/internal-reports")]
-[Authorize(Roles = "Teacher,TeacherSupervisor,SchoolManager,SchoolAdmin")]
+[Authorize(Roles = "Teacher,TeacherSupervisor,SchoolManager,SchoolAdmin,Parent")]
 public class InternalReportsController : ControllerBase
 {
     private readonly IInternalReportService _reportService;
@@ -46,6 +46,7 @@ public class InternalReportsController : ControllerBase
     }
 
     [HttpPost("{id:guid}/comments")]
+    [Authorize(Roles = "Teacher,TeacherSupervisor,SchoolManager,SchoolAdmin")]
     public async Task<IActionResult> AddComment(Guid id, [FromBody] AddInternalReportCommentRequest req, CancellationToken ct)
     {
         var r = await _reportService.AddCommentAsync(id, UserId, req, ct);
@@ -53,6 +54,7 @@ public class InternalReportsController : ControllerBase
     }
 
     [HttpPost("{id:guid}/escalate")]
+    [Authorize(Roles = "Teacher,TeacherSupervisor,SchoolManager,SchoolAdmin")]
     public async Task<IActionResult> Escalate(Guid id, [FromBody] EscalateInternalReportRequest req, CancellationToken ct)
     {
         var r = await _reportService.EscalateAsync(id, req, ct);
@@ -60,6 +62,7 @@ public class InternalReportsController : ControllerBase
     }
 
     [HttpPost("{id:guid}/resolve")]
+    [Authorize(Roles = "Teacher,TeacherSupervisor,SchoolManager,SchoolAdmin")]
     public async Task<IActionResult> Resolve(Guid id, CancellationToken ct)
     {
         var r = await _reportService.ResolveAsync(id, ct);

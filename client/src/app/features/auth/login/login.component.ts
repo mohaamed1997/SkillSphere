@@ -1,28 +1,33 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
+import { I18nService } from '@core/i18n/i18n.service';
+import { TranslatePipe } from '@core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   template: `
     <div class="login-container">
+      <button type="button" class="lang-switch" (click)="i18n.toggle()">
+        {{ i18n.lang() === 'ar' ? 'English' : 'العربية' }}
+      </button>
       <div class="login-card">
         <div class="login-header">
           <i class="material-icons login-icon">school</i>
-          <h1>SkillSphere</h1>
-          <p>School Management Platform</p>
+          <h1>{{ 'SkillSphere' | t }}</h1>
+          <p>{{ 'School Management Platform' | t }}</p>
         </div>
         <form (ngSubmit)="onLogin()">
           <div class="form-group">
-            <label><i class="material-icons" style="font-size:16px;vertical-align:middle;margin-right:4px">email</i> Email</label>
+            <label><i class="material-icons" style="font-size:16px;vertical-align:middle;margin-right:4px">email</i> {{ 'Email' | t }}</label>
             <input type="email" [(ngModel)]="email" name="email" required placeholder="admin@school.com" />
           </div>
           <div class="form-group">
-            <label><i class="material-icons" style="font-size:16px;vertical-align:middle;margin-right:4px">lock</i> Password</label>
+            <label><i class="material-icons" style="font-size:16px;vertical-align:middle;margin-right:4px">lock</i> {{ 'Password' | t }}</label>
             <input type="password" [(ngModel)]="password" name="password" required placeholder="••••••••" />
           </div>
           <div class="login-error" *ngIf="error">
@@ -30,7 +35,7 @@ import { AuthService } from '@core/services/auth.service';
             {{ error }}
           </div>
           <button type="submit" class="btn-login" [disabled]="loading">
-            {{ loading ? 'Signing in...' : 'Sign In' }}
+            {{ (loading ? 'Signing in...' : 'Sign In') | t }}
           </button>
         </form>
       </div>
@@ -39,7 +44,7 @@ import { AuthService } from '@core/services/auth.service';
   styles: [`
     .login-container {
       display: flex; justify-content: center; align-items: center; min-height: 100vh;
-      background: linear-gradient(135deg, #7b1fa2 0%, #e91e63 100%);
+      background: linear-gradient(135deg, #7b1fa2 0%, #e91e63 100%); position: relative;
     }
     .login-card {
       background: #fff; padding: 0; border-radius: 6px; width: 400px;
@@ -76,6 +81,14 @@ import { AuthService } from '@core/services/auth.service';
     }
     .btn-login:hover { box-shadow: 0 14px 26px -12px rgba(233,30,99,.42), 0 4px 23px 0 rgba(0,0,0,.12), 0 8px 10px -5px rgba(233,30,99,.2); }
     .btn-login:disabled { opacity: 0.65; cursor: not-allowed; }
+    .lang-switch {
+      position: absolute; top: 16px; right: 16px;
+      background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 18px; padding: 4px 14px; font-size: 12px; cursor: pointer; font-family: inherit;
+      backdrop-filter: blur(4px); transition: background 0.15s;
+    }
+    .lang-switch:hover { background: rgba(255,255,255,0.3); }
+    :host-context([dir="rtl"]) .lang-switch { right: auto; left: 16px; }
   `]
 })
 export class LoginComponent {
@@ -83,6 +96,7 @@ export class LoginComponent {
   password = '';
   error = '';
   loading = false;
+  readonly i18n = inject(I18nService);
 
   constructor(private auth: AuthService, private router: Router) {
     if (auth.isLoggedIn) this.router.navigate(['/dashboard']);
@@ -98,7 +112,7 @@ export class LoginComponent {
       },
       error: (err: any) => {
         this.loading = false;
-        this.error = err.error?.error || 'Invalid credentials';
+        this.error = this.i18n.t(err.error?.error || 'Invalid credentials');
       }
     });
   }

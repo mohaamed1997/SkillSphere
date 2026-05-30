@@ -81,7 +81,7 @@ export const routes: Routes = [
   },
   {
     path: 'internal-reports',
-    canActivate: [roleGuard('Teacher', 'TeacherSupervisor', 'SchoolManager', 'SchoolAdmin')],
+    canActivate: [roleGuard('Teacher', 'TeacherSupervisor', 'SchoolManager', 'SchoolAdmin', 'Parent')],
     loadComponent: () => import('./features/reports/internal-reports/internal-reports.component').then(m => m.InternalReportsComponent)
   },
   {

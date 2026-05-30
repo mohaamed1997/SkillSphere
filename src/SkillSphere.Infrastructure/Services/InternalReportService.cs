@@ -4,6 +4,7 @@ using SkillSphere.Application.DTOs.Reports;
 using SkillSphere.Application.Interfaces;
 using SkillSphere.Domain.Entities;
 using SkillSphere.Domain.Enums;
+using SkillSphere.Domain.Interfaces;
 using SkillSphere.Infrastructure.Persistence;
 
 namespace SkillSphere.Infrastructure.Services;
@@ -11,11 +12,31 @@ namespace SkillSphere.Infrastructure.Services;
 public class InternalReportService : IInternalReportService
 {
     private readonly SkillSphereDbContext _db;
-    public InternalReportService(SkillSphereDbContext db) => _db = db;
+    private readonly ICurrentUserService _currentUser;
+    public InternalReportService(SkillSphereDbContext db, ICurrentUserService currentUser)
+    {
+        _db = db;
+        _currentUser = currentUser;
+    }
 
     public async Task<Result<PagedResult<InternalReportDto>>> GetReportsAsync(Guid tenantId, Guid? supervisorId, Guid? reporterId, PaginationParams? p, CancellationToken ct)
     {
         p ??= new PaginationParams();
+
+        List<Guid>? parentChildIds = null;
+        if (_currentUser.Role == UserRole.Parent)
+        {
+            var userId = _currentUser.UserId ?? throw new UnauthorizedAccessException("User context required.");
+            parentChildIds = await _db.ParentLinks
+                .Where(pl => pl.ParentProfile.UserId == userId)
+                .Select(pl => pl.StudentProfileId)
+                .ToListAsync(ct);
+
+            if (parentChildIds.Count == 0)
+                return Result<PagedResult<InternalReportDto>>.Success(new PagedResult<InternalReportDto>
+                { Items = new List<InternalReportDto>(), TotalCount = 0, Page = p.Page, PageSize = p.PageSize });
+        }
+
         var q = _db.InternalReports
             .Include(r => r.ReporterTeacher).ThenInclude(t => t.User)
             .Include(r => r.StudentProfile).ThenInclude(s => s!.User)
@@ -23,6 +44,9 @@ public class InternalReportService : IInternalReportService
             .Include(r => r.EscalatedToUser)
             .Include(r => r.Comments).ThenInclude(c => c.AuthorUser)
             .Where(r => r.SchoolTenantId == tenantId);
+
+        if (parentChildIds is not null)
+            q = q.Where(r => r.StudentProfileId != null && parentChildIds.Contains(r.StudentProfileId.Value));
 
         if (supervisorId.HasValue) q = q.Where(r => r.AssignedSupervisorId == supervisorId.Value);
         if (reporterId.HasValue) q = q.Where(r => r.ReporterTeacherProfileId == reporterId.Value);
@@ -47,7 +71,17 @@ public class InternalReportService : IInternalReportService
             .Include(r => r.Comments).ThenInclude(c => c.AuthorUser)
             .FirstOrDefaultAsync(r => r.Id == id, ct);
 
-        return r == null ? Result<InternalReportDto>.Failure("Report not found.") : Result<InternalReportDto>.Success(MapDto(r));
+        if (r == null) return Result<InternalReportDto>.Failure("Report not found.");
+
+        if (_currentUser.Role == UserRole.Parent)
+        {
+            var userId = _currentUser.UserId ?? throw new UnauthorizedAccessException("User context required.");
+            if (r.StudentProfileId == null) return Result<InternalReportDto>.Failure("Access denied.");
+            var isLinked = await _db.ParentLinks.AnyAsync(pl => pl.ParentProfile.UserId == userId && pl.StudentProfileId == r.StudentProfileId, ct);
+            if (!isLinked) return Result<InternalReportDto>.Failure("Access denied.");
+        }
+
+        return Result<InternalReportDto>.Success(MapDto(r));
     }
 
     public async Task<Result<InternalReportDto>> CreateAsync(Guid tenantId, Guid teacherProfileId, CreateInternalReportRequest req, CancellationToken ct)

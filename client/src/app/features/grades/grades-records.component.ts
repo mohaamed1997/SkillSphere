@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { GradesService, AssignmentService, AcademicService, TimetableService } from '@core/services/data.service';
 import { AuthService } from '@core/services/auth.service';
 import { LocalDatePipe } from '@core/pipes/local-date.pipe';
+import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { StudentAssignmentDto, GradeRecordDto, BehaviorFeedbackDto, CreateGradeRecordRequest, CreateBehaviorFeedbackRequest, SemesterDto, TimetableEntryDto, TimetableVersionDto } from '@core/models';
 
 interface SessionOption {
@@ -16,13 +17,13 @@ interface SessionOption {
 @Component({
   selector: 'app-grades-records',
   standalone: true,
-  imports: [CommonModule, FormsModule, LocalDatePipe],
+  imports: [CommonModule, FormsModule, LocalDatePipe, TranslatePipe],
   template: `
-    <div class="page-header"><h1>Grade Records</h1></div>
+    <div class="page-header"><h1>{{ 'Grade Records' | t }}</h1></div>
 
     <div class="tabs">
-      <button class="tab-btn" [class.active]="tab==='grades'" (click)="tab='grades'">Grade Records</button>
-      <button class="tab-btn" [class.active]="tab==='behavior'" (click)="tab='behavior'">Behavior Feedback</button>
+      <button class="tab-btn" [class.active]="tab==='grades'" (click)="tab='grades'">{{ 'Grade Records' | t }}</button>
+      <button class="tab-btn" [class.active]="tab==='behavior'" (click)="tab='behavior'">{{ 'Behavior Feedback' | t }}</button>
     </div>
 
     <!-- ====== GRADE RECORDS TAB ====== -->
@@ -30,68 +31,68 @@ interface SessionOption {
       <!-- ADD GRADE FORM (Teacher only) -->
       <div class="card" *ngIf="isTeacher">
         <div class="card-header card-header-success" (click)="showGradeForm=!showGradeForm" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center">
-          <h4 class="card-title">+ Add Grade Record</h4>
+          <h4 class="card-title">{{ '+ Add Grade Record' | t }}</h4>
           <span>{{showGradeForm ? '▲' : '▼'}}</span>
         </div>
         <div class="card-body" *ngIf="showGradeForm">
           <div class="form-grid">
             <div class="form-group">
-              <label>Session (Subject / Group)</label>
+              <label>{{ 'Session (Subject / Group)' | t }}</label>
               <select [(ngModel)]="gradeForm.sessionIdx" (ngModelChange)="onGradeSessionChange()">
-                <option [ngValue]="-1">-- Select --</option>
+                <option [ngValue]="-1">{{ '-- Select --' | t }}</option>
                 <option *ngFor="let s of sessionOptions; let i = index" [ngValue]="i">
                   {{s.label}}
                 </option>
               </select>
             </div>
             <div class="form-group">
-              <label>Student</label>
+              <label>{{ 'Student' | t }}</label>
               <select [(ngModel)]="gradeForm.studentProfileId">
-                <option value="">-- Select --</option>
+                <option value="">{{ '-- Select --' | t }}</option>
                 <option *ngFor="let s of gradeStudents" [value]="s.studentProfileId">{{s.studentName}}</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Assessment Type</label>
+              <label>{{ 'Assessment Type' | t }}</label>
               <select [(ngModel)]="gradeForm.assessmentType">
-                <option value="">-- Select --</option>
-                <option value="Quiz">Quiz</option>
-                <option value="Test">Test</option>
-                <option value="MidtermExam">Midterm Exam</option>
-                <option value="FinalExam">Final Exam</option>
-                <option value="Homework">Homework</option>
-                <option value="Project">Project</option>
-                <option value="Participation">Participation</option>
+                <option value="">{{ '-- Select --' | t }}</option>
+                <option value="Quiz">{{ 'Quiz' | t }}</option>
+                <option value="Test">{{ 'Test' | t }}</option>
+                <option value="MidtermExam">{{ 'Midterm Exam' | t }}</option>
+                <option value="FinalExam">{{ 'Final Exam' | t }}</option>
+                <option value="Homework">{{ 'Homework' | t }}</option>
+                <option value="Project">{{ 'Project' | t }}</option>
+                <option value="Participation">{{ 'Participation' | t }}</option>
               </select>
             </div>
           </div>
           <div class="form-grid">
             <div class="form-group">
-              <label>Score</label>
+              <label>{{ 'Score' | t }}</label>
               <input type="number" [(ngModel)]="gradeForm.score" placeholder="e.g. 85" />
             </div>
             <div class="form-group">
-              <label>Max Score</label>
+              <label>{{ 'Max Score' | t }}</label>
               <input type="number" [(ngModel)]="gradeForm.maxScore" placeholder="e.g. 100" />
             </div>
             <div class="form-group">
-              <label>Letter Grade (optional)</label>
+              <label>{{ 'Letter Grade (optional)' | t }}</label>
               <select [(ngModel)]="gradeForm.letterGrade">
-                <option value="">-- Select --</option>
+                <option value="">{{ '-- Select --' | t }}</option>
                 <option *ngFor="let g of letterGrades" [value]="g">{{g}}</option>
               </select>
             </div>
           </div>
           <div class="form-group">
-            <label>Notes (optional)</label>
-            <textarea [(ngModel)]="gradeForm.notes" rows="2" placeholder="Additional notes..."></textarea>
+            <label>{{ 'Notes (optional)' | t }}</label>
+            <textarea [(ngModel)]="gradeForm.notes" rows="2" [placeholder]="'Additional notes...' | t"></textarea>
           </div>
           <div class="card-footer" style="display:flex;justify-content:flex-end">
             <button class="btn btn-primary" (click)="submitGradeRecord()" [disabled]="gradeSubmitting">
-              {{gradeSubmitting ? 'Saving...' : 'Save Grade Record'}}
+              {{ (gradeSubmitting ? 'Saving...' : 'Save Grade Record') | t }}
             </button>
           </div>
-          <div class="alert alert-success" *ngIf="gradeSuccess">Grade record saved!</div>
+          <div class="alert alert-success" *ngIf="gradeSuccess">{{ 'Grade record saved!' | t }}</div>
           <div class="alert alert-danger" *ngIf="gradeError">{{gradeError}}</div>
         </div>
       </div>
@@ -99,19 +100,32 @@ interface SessionOption {
       <!-- EXISTING RECORDS TABLE -->
       <div class="card">
         <div class="card-header card-header-primary">
-          <h4 class="card-title">Grade Records</h4>
-          <p class="card-category">All recorded grades</p>
+          <h4 class="card-title">{{ 'Grade Records' | t }}</h4>
+          <p class="card-category">{{ 'All recorded grades' | t }}</p>
         </div>
         <div class="card-body">
+          <div class="filter-row">
+            <div class="form-group">
+              <label>{{ 'Search Student' | t }}</label>
+              <input type="text" [(ngModel)]="gradeFilter.studentName" [placeholder]="'Student name' | t" />
+            </div>
+            <div class="form-group">
+              <label>{{ 'Subject' | t }}</label>
+              <select [(ngModel)]="gradeFilter.subjectName">
+                <option value="">{{ 'All Subjects' | t }}</option>
+                <option *ngFor="let s of distinctGradeSubjects" [value]="s">{{ s }}</option>
+              </select>
+            </div>
+          </div>
           <div class="table-responsive">
             <table class="table">
-              <thead><tr><th>Student</th><th>Subject</th><th>Score</th><th>Grade</th><th>Assessment</th><th>Date</th></tr></thead>
+              <thead><tr><th>{{ 'Student' | t }}</th><th>{{ 'Subject' | t }}</th><th>{{ 'Score' | t }}</th><th>{{ 'Grade' | t }}</th><th>{{ 'Assessment' | t }}</th><th>{{ 'Date' | t }}</th></tr></thead>
               <tbody>
-                <tr *ngFor="let r of gradeRecords">
+                <tr *ngFor="let r of filteredGradeRecords">
                   <td>{{r.studentName}}</td><td>{{r.subjectName}}</td><td>{{r.score}}/{{r.maxScore}}</td>
                   <td>{{r.letterGrade}}</td><td>{{r.assessmentType}}</td><td>{{r.recordedDate | localDate:'mediumDate'}}</td>
                 </tr>
-                <tr *ngIf="!gradeRecords.length"><td colspan="6" class="empty-row">No grade records found.</td></tr>
+                <tr *ngIf="!filteredGradeRecords.length"><td colspan="6" class="empty-row">{{ 'No grade records found.' | t }}</td></tr>
               </tbody>
             </table>
           </div>
@@ -124,60 +138,60 @@ interface SessionOption {
       <!-- ADD BEHAVIOR FEEDBACK FORM (Teacher only) -->
       <div class="card" *ngIf="isTeacher">
         <div class="card-header card-header-warning" (click)="showBehaviorForm=!showBehaviorForm" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center">
-          <h4 class="card-title">+ Add Behavior Feedback</h4>
+          <h4 class="card-title">{{ '+ Add Behavior Feedback' | t }}</h4>
           <span>{{showBehaviorForm ? '▲' : '▼'}}</span>
         </div>
         <div class="card-body" *ngIf="showBehaviorForm">
           <div class="form-grid">
             <div class="form-group">
-              <label>Session (Subject / Group)</label>
+              <label>{{ 'Session (Subject / Group)' | t }}</label>
               <select [(ngModel)]="behaviorForm.sessionIdx" (ngModelChange)="onBehaviorSessionChange()">
-                <option [ngValue]="-1">-- Select --</option>
+                <option [ngValue]="-1">{{ '-- Select --' | t }}</option>
                 <option *ngFor="let s of sessionOptions; let i = index" [ngValue]="i">
                   {{s.label}}
                 </option>
               </select>
             </div>
             <div class="form-group">
-              <label>Student</label>
+              <label>{{ 'Student' | t }}</label>
               <select [(ngModel)]="behaviorForm.studentProfileId">
-                <option value="">-- Select --</option>
+                <option value="">{{ '-- Select --' | t }}</option>
                 <option *ngFor="let s of behaviorStudents" [value]="s.studentProfileId">{{s.studentName}}</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Category</label>
+              <label>{{ 'Category' | t }}</label>
               <select [(ngModel)]="behaviorForm.category">
-                <option value="">-- Select --</option>
-                <option value="Participation">Participation</option>
-                <option value="Discipline">Discipline</option>
-                <option value="Teamwork">Teamwork</option>
-                <option value="Leadership">Leadership</option>
-                <option value="Respect">Respect</option>
-                <option value="Punctuality">Punctuality</option>
-                <option value="Homework">Homework</option>
+                <option value="">{{ '-- Select --' | t }}</option>
+                <option value="Participation">{{ 'Participation' | t }}</option>
+                <option value="Discipline">{{ 'Discipline' | t }}</option>
+                <option value="Teamwork">{{ 'Teamwork' | t }}</option>
+                <option value="Leadership">{{ 'Leadership' | t }}</option>
+                <option value="Respect">{{ 'Respect' | t }}</option>
+                <option value="Punctuality">{{ 'Punctuality' | t }}</option>
+                <option value="Homework">{{ 'Homework' | t }}</option>
               </select>
             </div>
           </div>
           <div class="form-grid">
             <div class="form-group">
-              <label>Rating (1-5)</label>
+              <label>{{ 'Rating (1-5)' | t }}</label>
               <div class="rating-buttons">
                 <button *ngFor="let n of [1,2,3,4,5]" [class.selected]="behaviorForm.rating===n"
                   (click)="behaviorForm.rating=n" class="rating-btn">{{n}}</button>
               </div>
             </div>
             <div class="form-group" style="grid-column: span 2">
-              <label>Description (optional)</label>
-              <textarea [(ngModel)]="behaviorForm.description" rows="2" placeholder="Describe the behavior..."></textarea>
+              <label>{{ 'Description (optional)' | t }}</label>
+              <textarea [(ngModel)]="behaviorForm.description" rows="2" [placeholder]="'Describe the behavior...' | t"></textarea>
             </div>
           </div>
           <div class="card-footer" style="display:flex;justify-content:flex-end">
             <button class="btn btn-primary" (click)="submitBehaviorFeedback()" [disabled]="behaviorSubmitting">
-              {{behaviorSubmitting ? 'Saving...' : 'Save Feedback'}}
+              {{ (behaviorSubmitting ? 'Saving...' : 'Save Feedback') | t }}
             </button>
           </div>
-          <div class="alert alert-success" *ngIf="behaviorSuccess">Behavior feedback saved!</div>
+          <div class="alert alert-success" *ngIf="behaviorSuccess">{{ 'Behavior feedback saved!' | t }}</div>
           <div class="alert alert-danger" *ngIf="behaviorError">{{behaviorError}}</div>
         </div>
       </div>
@@ -185,18 +199,18 @@ interface SessionOption {
       <!-- EXISTING BEHAVIOR TABLE -->
       <div class="card">
         <div class="card-header card-header-primary">
-          <h4 class="card-title">Behavior Feedback</h4>
-          <p class="card-category">All recorded behavior feedback</p>
+          <h4 class="card-title">{{ 'Behavior Feedback' | t }}</h4>
+          <p class="card-category">{{ 'All recorded behavior feedback' | t }}</p>
         </div>
         <div class="card-body">
           <div class="table-responsive">
             <table class="table">
-              <thead><tr><th>Student</th><th>Category</th><th>Rating</th><th>Description</th><th>Date</th></tr></thead>
+              <thead><tr><th>{{ 'Student' | t }}</th><th>{{ 'Category' | t }}</th><th>{{ 'Rating' | t }}</th><th>{{ 'Description' | t }}</th><th>{{ 'Date' | t }}</th></tr></thead>
               <tbody>
                 <tr *ngFor="let b of behaviorFeedback">
                   <td>{{b.studentName}}</td><td>{{b.category}}</td><td>{{b.rating}}/5</td><td>{{b.description}}</td><td>{{b.recordedDate | localDate:'mediumDate'}}</td>
                 </tr>
-                <tr *ngIf="!behaviorFeedback.length"><td colspan="5" class="empty-row">No behavior feedback found.</td></tr>
+                <tr *ngIf="!behaviorFeedback.length"><td colspan="5" class="empty-row">{{ 'No behavior feedback found.' | t }}</td></tr>
               </tbody>
             </table>
           </div>
@@ -214,6 +228,7 @@ export class GradesRecordsComponent implements OnInit {
 
   // Grade Records
   gradeRecords: GradeRecordDto[] = [];
+  gradeFilter = { studentName: '', subjectName: '' };
   showGradeForm = false;
   gradeStudents: StudentAssignmentDto[] = [];
   gradeForm = { sessionIdx: -1 as number, studentProfileId: '', score: null as number | null, maxScore: null as number | null, letterGrade: '', assessmentType: '', notes: '' };
@@ -293,6 +308,19 @@ export class GradesRecordsComponent implements OnInit {
     if (!session || !session.groupId) return;
     this.assignmentSvc.getStudentAssignments({ groupId: session.groupId, semesterId: session.semesterId })
       .subscribe(s => this.behaviorStudents = s.filter(x => x.isActive));
+  }
+
+  get distinctGradeSubjects(): string[] {
+    return Array.from(new Set(this.gradeRecords.map(r => r.subjectName).filter(x => !!x))).sort();
+  }
+
+  get filteredGradeRecords(): GradeRecordDto[] {
+    const nameQ = this.gradeFilter.studentName.trim().toLowerCase();
+    const subj = this.gradeFilter.subjectName;
+    return this.gradeRecords.filter(r =>
+      (!nameQ || (r.studentName || '').toLowerCase().includes(nameQ)) &&
+      (!subj || r.subjectName === subj)
+    );
   }
 
   submitGradeRecord() {

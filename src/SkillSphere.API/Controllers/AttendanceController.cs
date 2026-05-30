@@ -44,7 +44,7 @@ public class AttendanceController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Teacher,TeacherSupervisor,SchoolManager,SchoolAdmin")]
+    [Authorize(Roles = "Teacher,TeacherSupervisor,SchoolManager,SchoolAdmin,Parent")]
     public async Task<IActionResult> Get([FromQuery] DateTime date, [FromQuery] Guid? groupId,
         [FromQuery] Guid? subjectId, CancellationToken ct)
         => Ok((await _attendanceService.GetAttendanceAsync(TenantId, date, groupId, subjectId, ct)).Data);

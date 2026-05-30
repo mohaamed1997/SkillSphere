@@ -2,38 +2,39 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AcademicService } from '@core/services/data.service';
+import { TranslatePipe } from '@core/i18n/translate.pipe';
 
 @Component({
   selector: 'app-subjects',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   template: `
     <div class="card" *ngIf="showForm">
       <div class="card-header card-header-info">
-        <h4 class="card-title">Add Subject</h4>
-        <p class="card-category">Create a new subject</p>
+        <h4 class="card-title">{{ 'Add Subject' | t }}</h4>
+        <p class="card-category">{{ 'Create a new subject' | t }}</p>
       </div>
       <div class="card-body">
         <div class="form-row">
-          <div class="form-group"><label>Name</label><input [(ngModel)]="form.name" /></div>
-          <div class="form-group"><label>Code</label><input [(ngModel)]="form.code" /></div>
+          <div class="form-group"><label>{{ 'Name' | t }}</label><input [(ngModel)]="form.name" /></div>
+          <div class="form-group"><label>{{ 'Code' | t }}</label><input [(ngModel)]="form.code" /></div>
         </div>
-        <button class="btn btn-primary" (click)="save()">Save</button>
-        <button class="btn btn-default" (click)="showForm=false">Cancel</button>
+        <button class="btn btn-primary" (click)="save()">{{ 'Save' | t }}</button>
+        <button class="btn btn-default" (click)="showForm=false">{{ 'Cancel' | t }}</button>
       </div>
     </div>
     <div class="card">
       <div class="card-header card-header-warning">
-        <h4 class="card-title">Subjects</h4>
-        <p class="card-category">Manage subject catalog</p>
+        <h4 class="card-title">{{ 'Subjects' | t }}</h4>
+        <p class="card-category">{{ 'Manage subject catalog' | t }}</p>
       </div>
       <div class="card-body">
-        <button class="btn btn-primary" (click)="showForm=!showForm" style="margin-bottom:15px">{{ showForm ? 'Cancel' : '+ Add' }}</button>
+        <button class="btn btn-primary" (click)="showForm=!showForm" style="margin-bottom:15px">{{ (showForm ? 'Cancel' : '+ Add') | t }}</button>
         <div class="table-responsive">
           <table class="table">
-            <thead><tr><th>Name</th><th>Code</th><th>Actions</th></tr></thead>
+            <thead><tr><th>{{ 'Name' | t }}</th><th>{{ 'Code' | t }}</th><th>{{ 'Actions' | t }}</th></tr></thead>
             <tbody><tr *ngFor="let s of items"><td>{{s.name}}</td><td>{{s.code}}</td>
-              <td><button class="btn btn-sm btn-danger" (click)="remove(s.id)">Delete</button></td></tr></tbody>
+              <td><button class="btn btn-sm btn-danger" (click)="remove(s.id)">{{ 'Delete' | t }}</button></td></tr></tbody>
           </table>
         </div>
       </div>
