@@ -13,22 +13,40 @@ import { TranslatePipe } from '@core/i18n/translate.pipe';
   template: `
     <div class="login-container">
       <button type="button" class="lang-switch" (click)="i18n.toggle()">
+        <i class="material-icons">language</i>
         {{ i18n.lang() === 'ar' ? 'English' : 'العربية' }}
       </button>
+
+      <div class="login-panel">
+        <div class="brand">
+          <span class="brand-icon"><i class="material-icons">school</i></span>
+          <span class="brand-name">{{ 'SkillSphere' | t }}</span>
+        </div>
+        <div class="panel-copy">
+          <h2>{{ 'School Management Platform' | t }}</h2>
+          <p>{{ 'Attendance, grades, timetables and reports — all in one place.' | t }}</p>
+        </div>
+      </div>
+
       <div class="login-card">
         <div class="login-header">
-          <i class="material-icons login-icon">school</i>
-          <h1>{{ 'SkillSphere' | t }}</h1>
-          <p>{{ 'School Management Platform' | t }}</p>
+          <h1>{{ 'Sign in' | t }}</h1>
+          <p>{{ 'Welcome back, please enter your details' | t }}</p>
         </div>
         <form (ngSubmit)="onLogin()">
           <div class="form-group">
-            <label><i class="material-icons" style="font-size:16px;vertical-align:middle;margin-right:4px">email</i> {{ 'Email' | t }}</label>
-            <input type="email" [(ngModel)]="email" name="email" required placeholder="admin@school.com" />
+            <label>{{ 'Email' | t }}</label>
+            <div class="input-with-icon">
+              <i class="material-icons">mail_outline</i>
+              <input type="email" [(ngModel)]="email" name="email" required placeholder="admin@school.com" />
+            </div>
           </div>
           <div class="form-group">
-            <label><i class="material-icons" style="font-size:16px;vertical-align:middle;margin-right:4px">lock</i> {{ 'Password' | t }}</label>
-            <input type="password" [(ngModel)]="password" name="password" required placeholder="••••••••" />
+            <label>{{ 'Password' | t }}</label>
+            <div class="input-with-icon">
+              <i class="material-icons">lock_outline</i>
+              <input type="password" [(ngModel)]="password" name="password" required placeholder="••••••••" />
+            </div>
           </div>
           <div class="login-error" *ngIf="error">
             <i class="material-icons">error_outline</i>
@@ -43,52 +61,80 @@ import { TranslatePipe } from '@core/i18n/translate.pipe';
   `,
   styles: [`
     .login-container {
-      display: flex; justify-content: center; align-items: center; min-height: 100vh;
-      background: linear-gradient(135deg, #7b1fa2 0%, #e91e63 100%); position: relative;
+      display: flex; min-height: 100vh; position: relative;
+      font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
     }
+
+    /* Left brand panel */
+    .login-panel {
+      flex: 1.1; display: none; flex-direction: column; justify-content: space-between;
+      padding: 48px; color: #fff;
+      background-image: linear-gradient(160deg, #1e3a8a 0%, #2563eb 100%),
+                         radial-gradient(circle at 85% 80%, rgba(255,255,255,0.08), transparent 45%);
+    }
+    @media (min-width: 900px) { .login-panel { display: flex; } }
+
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-icon {
+      width: 40px; height: 40px; border-radius: var(--radius-md);
+      background: var(--primary); display: flex; align-items: center; justify-content: center;
+      i { font-size: 22px; color: #fff; }
+    }
+    .brand-name { font-size: 18px; font-weight: 700; letter-spacing: 0.2px; }
+
+    .panel-copy h2 { font-size: 2rem; font-weight: 700; color: #fff; margin: 0 0 12px; line-height: 1.3; max-width: 460px; }
+    .panel-copy p { font-size: 15px; color: rgba(255,255,255,0.6); max-width: 420px; line-height: 1.6; margin: 0; }
+
+    /* Right form panel */
     .login-card {
-      background: #fff; padding: 0; border-radius: 6px; width: 400px;
-      box-shadow: 0 10px 30px -12px rgba(0,0,0,0.42), 0 4px 25px 0 rgba(0,0,0,0.12), 0 8px 10px -5px rgba(0,0,0,0.2);
-      overflow: hidden;
+      flex: 1; display: flex; flex-direction: column; justify-content: center;
+      padding: 40px; max-width: 460px; margin: 0 auto; width: 100%;
     }
-    .login-header {
-      background: linear-gradient(60deg, #ec407a, #d81b60);
-      color: #fff; padding: 30px 40px 24px; text-align: center;
+    .login-header { margin-bottom: 28px; }
+    .login-header h1 { margin: 0; font-size: 1.625rem; font-weight: 700; color: var(--gray-900); }
+    .login-header p { color: var(--gray-500); margin: 6px 0 0; font-size: 14px; }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; color: var(--gray-600); }
+    .input-with-icon {
+      position: relative; display: flex; align-items: center;
+      i { position: absolute; left: 12px; font-size: 20px; color: var(--gray-400); }
     }
-    .login-icon { font-size: 48px; margin-bottom: 8px; }
-    h1 { margin: 0; font-size: 1.5rem; font-weight: 400; color: #fff; }
-    .login-header p { color: rgba(255,255,255,0.7); margin: 4px 0 0; font-size: 14px; }
-    form { padding: 30px 40px 40px; }
-    .form-group { margin-bottom: 20px; }
-    .form-group label { display: block; margin-bottom: 6px; font-weight: 400; font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.3px; }
-    .form-group input {
-      width: 100%; padding: 10px 12px; border: none; border-bottom: 1px solid #ddd;
-      border-radius: 0; font-size: 14px; font-family: inherit; color: #3c4858;
-      background: transparent; transition: border-color 0.15s; box-sizing: border-box;
+    .input-with-icon input {
+      width: 100%; padding: 11px 12px 11px 42px; border: 1px solid var(--border-color);
+      border-radius: var(--radius-md); font-size: 14px; font-family: inherit; color: var(--gray-800);
+      background: var(--surface); transition: var(--transition); box-sizing: border-box;
     }
-    .form-group input:focus { outline: none; border-bottom-color: #e91e63; }
+    .input-with-icon input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+    .input-with-icon input::placeholder { color: var(--gray-400); }
+
     .login-error {
       display: flex; align-items: center; gap: 8px;
-      background: #ffebee; color: #c62828; padding: 10px 14px; border-radius: 4px; margin-bottom: 16px; font-size: 13px;
+      background: var(--danger-light); color: #b91c1c; padding: 10px 14px; border-radius: var(--radius-md); margin-bottom: 16px; font-size: 13px;
     }
     .login-error i { font-size: 18px; }
+
     .btn-login {
-      width: 100%; padding: 12px; border: none; border-radius: 4px; font-size: 14px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; font-family: inherit;
-      background: linear-gradient(60deg, #ec407a, #d81b60); color: #fff;
-      box-shadow: 0 2px 2px 0 rgba(233,30,99,.14), 0 3px 1px -2px rgba(233,30,99,.2), 0 1px 5px 0 rgba(233,30,99,.12);
-      transition: box-shadow 0.15s;
+      width: 100%; padding: 12px; border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+      background: var(--primary); color: #fff;
+      transition: background 0.15s;
     }
-    .btn-login:hover { box-shadow: 0 14px 26px -12px rgba(233,30,99,.42), 0 4px 23px 0 rgba(0,0,0,.12), 0 8px 10px -5px rgba(233,30,99,.2); }
-    .btn-login:disabled { opacity: 0.65; cursor: not-allowed; }
+    .btn-login:hover { background: var(--primary-dark); }
+    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
+
     .lang-switch {
-      position: absolute; top: 16px; right: 16px;
-      background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.5);
-      border-radius: 18px; padding: 4px 14px; font-size: 12px; cursor: pointer; font-family: inherit;
-      backdrop-filter: blur(4px); transition: background 0.15s;
+      position: absolute; top: 20px; right: 20px; z-index: 2;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--surface); color: var(--gray-700); border: 1px solid var(--border-color);
+      border-radius: var(--radius-pill); padding: 6px 14px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit;
+      transition: background 0.15s;
+      i { font-size: 16px; color: var(--gray-400); }
     }
-    .lang-switch:hover { background: rgba(255,255,255,0.3); }
-    :host-context([dir="rtl"]) .lang-switch { right: auto; left: 16px; }
+    .lang-switch:hover { background: var(--gray-50); }
+    :host-context([dir="rtl"]) .lang-switch { right: auto; left: 20px; }
+    :host-context([dir="rtl"]) .input-with-icon i { left: auto; right: 12px; }
+    :host-context([dir="rtl"]) .input-with-icon input { padding: 11px 42px 11px 12px; }
   `]
 })
 export class LoginComponent {
