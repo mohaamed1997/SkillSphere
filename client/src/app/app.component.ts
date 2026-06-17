@@ -39,6 +39,7 @@ export class AppComponent implements OnInit, OnDestroy {
     '/grades-records': 'Grade Records',
     '/weekly-reports': 'Weekly Reports',
     '/internal-reports': 'Internal Reports',
+    '/achievements': 'Achievements',
   };
 
   constructor(public auth: AuthService, private router: Router) {}

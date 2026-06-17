@@ -85,6 +85,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/reports/internal-reports/internal-reports.component').then(m => m.InternalReportsComponent)
   },
   {
+    path: 'achievements',
+    canActivate: [roleGuard('Student', 'Parent', 'Teacher')],
+    loadComponent: () => import('./features/achievements/achievements.component').then(m => m.AchievementsComponent)
+  },
+  {
     path: 'unauthorized',
     loadComponent: () => import('./features/shared/unauthorized/unauthorized.component').then(m => m.UnauthorizedComponent)
   },

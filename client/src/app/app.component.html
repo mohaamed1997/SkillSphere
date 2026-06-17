@@ -119,6 +119,12 @@
             <p>{{ 'Internal Reports' | t }}</p>
           </a>
         </li>
+        <li routerLinkActive="active" *ngIf="['Student','Parent','Teacher'].includes(auth.userRole!)">
+          <a routerLink="/achievements">
+            <i class="material-icons">emoji_events</i>
+            <p>{{ 'Achievements' | t }}</p>
+          </a>
+        </li>
       </ul>
     </div>
   </div>
