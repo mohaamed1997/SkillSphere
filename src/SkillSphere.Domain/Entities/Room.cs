@@ -6,6 +6,7 @@ namespace SkillSphere.Domain.Entities;
 public class Room : TenantEntity
 {
     public string Name { get; set; } = string.Empty;
+    public string NameAr { get; set; } = string.Empty;
     public string Code { get; set; } = string.Empty;
     public RoomType RoomType { get; set; }
     public int Capacity { get; set; }

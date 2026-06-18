@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkillSphere.Infrastructure.Persistence;
 
@@ -10,9 +11,11 @@ using SkillSphere.Infrastructure.Persistence;
 namespace SkillSphere.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(SkillSphereDbContext))]
-    partial class SkillSphereDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260618074725_AddSemesterNameAr")]
+    partial class AddSemesterNameAr
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
@@ -455,10 +458,6 @@ namespace SkillSphere.Infrastructure.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("NameAr")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<Guid>("SchoolTenantId")
                         .HasColumnType("TEXT");
 
@@ -537,10 +536,6 @@ namespace SkillSphere.Infrastructure.Persistence.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NameAr")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("OrderIndex")
@@ -658,10 +653,6 @@ namespace SkillSphere.Infrastructure.Persistence.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NameAr")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("SchoolTenantId")
@@ -1091,10 +1082,6 @@ namespace SkillSphere.Infrastructure.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("NameAr")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("RoomType")
                         .HasColumnType("INTEGER");
 
@@ -1362,10 +1349,6 @@ namespace SkillSphere.Infrastructure.Persistence.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NameAr")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("RequiredRoomType")

@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RoomService } from '@core/services/data.service';
 import { RoomDto } from '@core/models';
 import { RoomType } from '@core/models/enums';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
+import { I18nService } from '@core/i18n/i18n.service';
 
 @Component({
   selector: 'app-rooms',
@@ -22,7 +23,8 @@ import { TranslatePipe } from '@core/i18n/translate.pipe';
       <div class="card-body">
         <div class="form-row">
           <div class="form-group"><label>{{ 'Code' | t }}</label><input [(ngModel)]="form.code" [placeholder]="'e.g. Room101' | t" /></div>
-          <div class="form-group"><label>{{ 'Name' | t }}</label><input [(ngModel)]="form.name" [placeholder]="'e.g. Room 101' | t" /></div>
+          <div class="form-group"><label>{{ 'Name (English)' | t }}</label><input [(ngModel)]="form.name" [placeholder]="'e.g. Room 101' | t" /></div>
+          <div class="form-group"><label>{{ 'Name (Arabic)' | t }}</label><input [(ngModel)]="form.nameAr" placeholder="مثال: قاعة 101" dir="rtl" /></div>
           <div class="form-group"><label>{{ 'Type' | t }}</label>
             <select [(ngModel)]="form.roomType">
               <option *ngFor="let t of roomTypes" [value]="t">{{t}}</option>
@@ -62,7 +64,12 @@ import { TranslatePipe } from '@core/i18n/translate.pipe';
             <thead><tr><th>{{ 'Code' | t }}</th><th>{{ 'Name' | t }}</th><th>{{ 'Type' | t }}</th><th>{{ 'Building' | t }}</th><th>{{ 'Floor' | t }}</th><th>{{ 'Capacity' | t }}</th><th>{{ 'Actions' | t }}</th></tr></thead>
             <tbody>
               <tr *ngFor="let r of items">
-                <td>{{r.code}}</td><td>{{r.name}}</td><td>{{r.roomType}}</td><td>{{r.building ?? '-'}}</td><td>{{r.floor ?? '-'}}</td><td>{{r.capacity ?? '-'}}</td>
+                <td>{{r.code}}</td>
+                <td>
+                  {{ i18n.lang() === 'ar' && r.nameAr ? r.nameAr : r.name }}
+                  <span *ngIf="i18n.lang() === 'ar' && !r.nameAr" style="color:#f59e0b;font-size:0.75rem;margin-inline-start:4px">{{ '(no Arabic name)' | t }}</span>
+                </td>
+                <td>{{r.roomType}}</td><td>{{r.building ?? '-'}}</td><td>{{r.floor ?? '-'}}</td><td>{{r.capacity ?? '-'}}</td>
                 <td>
                   <button class="btn btn-sm btn-info" (click)="edit(r)">{{ 'Edit' | t }}</button>
                   <button class="btn btn-sm btn-danger" (click)="remove(r.id)">{{ 'Delete' | t }}</button>
@@ -83,6 +90,7 @@ export class RoomsComponent implements OnInit {
   editId: string | null = null;
   filterType = '';
   roomTypes = Object.values(RoomType);
+  readonly i18n = inject(I18nService);
 
   constructor(private svc: RoomService) {}
 
@@ -102,7 +110,7 @@ export class RoomsComponent implements OnInit {
 
   edit(r: RoomDto) {
     this.editId = r.id;
-    this.form = { code: r.code, name: r.name, roomType: r.roomType, floor: r.floor, capacity: r.capacity };
+    this.form = { code: r.code, name: r.name, nameAr: r.nameAr || '', roomType: r.roomType, building: r.building, floor: r.floor, capacity: r.capacity };
     this.showForm = true;
   }
 

@@ -6,6 +6,7 @@ namespace SkillSphere.Domain.Entities;
 public class Subject : TenantEntity
 {
     public string Name { get; set; } = string.Empty;
+    public string NameAr { get; set; } = string.Empty;
     public string? Code { get; set; }
     public Guid? DepartmentId { get; set; }
     public Department? Department { get; set; }

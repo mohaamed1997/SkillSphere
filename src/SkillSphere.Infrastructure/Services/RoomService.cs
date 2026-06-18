@@ -20,7 +20,7 @@ public class RoomService : IRoomService
 
         var items = await q.OrderBy(r => r.Code).Select(r => new RoomDto
         {
-            Id = r.Id, Name = r.Name, Code = r.Code, RoomType = r.RoomType,
+            Id = r.Id, Name = r.Name, NameAr = r.NameAr, Code = r.Code, RoomType = r.RoomType,
             Capacity = r.Capacity, Building = r.Building, Floor = r.Floor, IsActive = r.IsActive
         }).ToListAsync(ct);
         return Result<List<RoomDto>>.Success(items);
@@ -33,7 +33,7 @@ public class RoomService : IRoomService
 
         var room = new Room
         {
-            Name = req.Name, Code = req.Code, RoomType = req.RoomType,
+            Name = req.Name, NameAr = req.NameAr, Code = req.Code, RoomType = req.RoomType,
             Capacity = req.Capacity, Building = req.Building, Floor = req.Floor,
             SchoolTenantId = tenantId
         };
@@ -42,7 +42,7 @@ public class RoomService : IRoomService
 
         return Result<RoomDto>.Success(new RoomDto
         {
-            Id = room.Id, Name = room.Name, Code = room.Code, RoomType = room.RoomType,
+            Id = room.Id, Name = room.Name, NameAr = room.NameAr, Code = room.Code, RoomType = room.RoomType,
             Capacity = room.Capacity, Building = room.Building, Floor = room.Floor, IsActive = true
         });
     }
@@ -55,13 +55,13 @@ public class RoomService : IRoomService
         if (await _db.Rooms.AnyAsync(r => r.SchoolTenantId == room.SchoolTenantId && r.Code == req.Code && r.Id != id, ct))
             return Result<RoomDto>.Failure($"Room code '{req.Code}' already exists.");
 
-        room.Name = req.Name; room.Code = req.Code; room.RoomType = req.RoomType;
+        room.Name = req.Name; room.NameAr = req.NameAr; room.Code = req.Code; room.RoomType = req.RoomType;
         room.Capacity = req.Capacity; room.Building = req.Building; room.Floor = req.Floor;
         await _db.SaveChangesAsync(ct);
 
         return Result<RoomDto>.Success(new RoomDto
         {
-            Id = room.Id, Name = room.Name, Code = room.Code, RoomType = room.RoomType,
+            Id = room.Id, Name = room.Name, NameAr = room.NameAr, Code = room.Code, RoomType = room.RoomType,
             Capacity = room.Capacity, Building = room.Building, Floor = room.Floor, IsActive = room.IsActive
         });
     }

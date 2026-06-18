@@ -3,6 +3,7 @@ import { RoomType } from './enums';
 export interface GradeDto {
   id: string;
   name: string;
+  nameAr: string;
   orderIndex: number;
   isActive: boolean;
   groupCount: number;
@@ -11,8 +12,10 @@ export interface GradeDto {
 export interface GroupDto {
   id: string;
   name: string;
+  nameAr: string;
   gradeId: string;
   gradeName: string;
+  gradeNameAr: string;
   capacity: number;
   isActive: boolean;
   studentCount: number;
@@ -21,6 +24,7 @@ export interface GroupDto {
 export interface SubjectDto {
   id: string;
   name: string;
+  nameAr: string;
   code?: string;
   departmentId?: string;
   departmentName?: string;
@@ -31,6 +35,7 @@ export interface SubjectDto {
 export interface DepartmentDto {
   id: string;
   name: string;
+  nameAr: string;
   description?: string;
   isActive: boolean;
   subjectCount: number;
@@ -39,6 +44,7 @@ export interface DepartmentDto {
 export interface SemesterDto {
   id: string;
   name: string;
+  nameAr: string;
   startDate: string;
   endDate: string;
   isCurrent: boolean;
@@ -79,6 +85,7 @@ export interface PeriodDefinitionDto {
 export interface RoomDto {
   id: string;
   name: string;
+  nameAr: string;
   code: string;
   roomType: RoomType;
   capacity: number;
