@@ -27,7 +27,7 @@ import { TranslatePipe } from '@core/i18n/translate.pipe';
 
         <div class="hero-content">
           <h1 class="hero-title">{{ 'School Management Platform' | t }}</h1>
-          <p class="hero-subtitle">{{ 'Attendance, grades, timetables and reports — all in one place.' | t }}</p>
+          <p class="hero-subtitle">{{ 'Attendance, grades, timetables and reports ! all in one place.' | t }}</p>
           <ul class="features-list">
             <li class="feature-item">
               <span class="feature-icon">✓</span>
